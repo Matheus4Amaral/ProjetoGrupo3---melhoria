@@ -1,0 +1,79 @@
+:root {
+  --color-primary: #FF9F1C;
+    --color-secondary: #2EC5B6;
+    --color-bg-dark: #181820;
+    --color-bg-card: #252837;
+    --color-text: #FFFFFF;
+    --color-text-muted: #9C9CAE;
+    --font-primary: "Kay Pho Du", serif;
+    --color-border: #2E313F;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  background-color: var(--color-bg-dark);
+  border-bottom: 0.5px solid var(--color-border);
+  padding: 1rem 2rem;
+}
+
+.navbar .icon {
+  width : 50px;
+  height: 50px;
+  
+}
+
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar .logo h1 {
+  color: var(--color-text);
+  font-size: 40px;
+}
+
+.navbar .logo span {
+  color: var(--color-secondary);
+}
+
+.btn-login {
+  height: 38px;
+  padding : 5px 20px;
+  background: transparent;
+  border : 0.5px solid var(--color-border);
+  color : var(--color-text);
+  text-decoration: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 14px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.btn-register {
+  background-color: var(--color-primary);
+  text-decoration: none;
+  border: none;
+  height: 38px;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: var(--color-bg-dark);
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 10px;
+  
+}
+
+.btn-container {
+  display :flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  gap: 10px;
+}

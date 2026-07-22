@@ -1,0 +1,28 @@
+.statCard {
+  background-color: #222431;
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.statCard h2 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.statCard span {
+  color: #a1a1aa;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.text-orange {
+  color: #f79c1e;
+}
+.text-cyan {
+  color: #2ab8a1;
+}
+.text-white {
+  color: #ffffff;
+}

@@ -1,0 +1,175 @@
+.loginPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #181820;
+}
+
+.loginCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3.5rem 3rem;
+  border-radius: 40px; /* Cantos arredondados pronunciados do print */
+  width: 100%;
+  max-width: 420px;
+  background-color: #252837; /* Cor exata do container central do print */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+/* Ícone central */
+.cardLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.25rem;
+}
+
+.rayIcon {
+  width: 44px;
+  height: 44px;
+  background-color: #ff9f1c; /* Laranja icônico */
+  color: #11131a;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+
+.rayIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.logoTitle {
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+  font-size: 1.45rem;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.logoSuffix {
+  color: #1df0dc; /* Ciano claro */
+  font-weight: 400;
+}
+
+/* Form */
+.form {
+  width: 100%;
+}
+
+.inputBox {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputBox label {
+  font-size: 0.95rem;
+  color: #8e95a5; /* Texto de label cinza do figma */
+  margin-bottom: 0.6rem;
+  text-align: left;
+  font-weight: 500;
+}
+
+.inputBox input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #2d3345;
+  border-radius: 10px; /* Curvas suaves dos inputs */
+  background-color: #11131a; /* Fundo preto/escuro interno */
+  color: #ffffff;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.inputBox input:focus {
+  outline: none;
+  border-color: #ff9f1c;
+}
+
+/* Esqueceu a Senha */
+.forgotContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.6rem;
+}
+
+.forgotLink {
+  color: #1df0dc; /* Azul/Ciano claro igual o print */
+  font-size: 0.8rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+}
+
+/* Botão de Submit Laranja Figma */
+.submitBtn {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 50px; /* Redondo "pílula" como o print */
+  background-color: #ff9f1c;
+  color: #11131a;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1.25rem;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: #e08a10;
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submitBtn:disabled {
+  background-color: #3e4453;
+  color: #8e94a5;
+  cursor: not-allowed;
+}
+
+/* Alerta de erro */
+.errorAlert {
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.15);
+  border: 1px solid rgba(255, 77, 77, 0.25);
+  padding: 0.75rem;
+  border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+/* Rodapé do Form */
+.footerRegister {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8e94a5;
+}
+
+.footerRegister a {
+  color: #1df0dc; /* Link ciano */
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footerRegister a:hover {
+  text-decoration: underline;
+}

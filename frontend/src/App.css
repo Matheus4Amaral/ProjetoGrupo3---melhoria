@@ -1,0 +1,24 @@
+* {
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #FF9F1C;
+    --color-secondary: #2EC5B6;
+    --color-bg-dark: #181820;
+    --color-bg-card: #252837;
+    --color-text: #FFFFFF;
+    --color-text-muted: #9C9CAE;
+    --font-primary: "Kay Pho Du", serif;
+    --color-border: #2E313F;
+}
+
+body {
+  background-color : var(--color-bg-dark);
+  font-family: var(--font-primary);
+  font-style: normal;
+  font-weight: 600;
+}
+

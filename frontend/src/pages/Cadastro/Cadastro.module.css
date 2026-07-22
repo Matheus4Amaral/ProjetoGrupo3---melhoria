@@ -1,0 +1,98 @@
+
+:root {
+  --color-primary: #FF9F1C;
+    --color-secondary: #2EC5B6;
+    --color-bg-dark: #181820;
+    --color-bg-card: #252837;
+    --color-text: #FFFFFF;
+    --color-text-muted: #9C9CAE;
+    --font-primary: "Kay Pho Du", serif;
+    --color-border: #2E313F;
+}
+
+.registerPage {
+    display : flex;
+    align-items : center;
+    justify-content: center;
+    min-height: 80vh;
+    margin: 2rem 0;
+    
+}
+
+.registerForm {
+    width: 100%;
+    max-width : 480px;
+    background-color : var(--color-bg-card);
+    border-radius: 70px ;
+    padding: 2.25rem 2rem;
+}
+
+.registerForm h2 {
+    color: var(--color-text);
+    font-size : 30px;
+    text-align :center;
+    font-weight : 600;
+    margin-bottom : 1.75rem;
+
+}
+
+.registerForm label {
+    display: block;
+    color : var(--color-text-muted);
+    font-size : 25px;
+    margin-bottom : 6px;
+}
+
+.registerForm input {
+    width : 100%;
+    height: 6vh;
+    background-color: var(--color-bg-dark);
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text);
+    padding: 0 14px;
+    font-size: 14px;
+    margin-bottom: 1.1rem;
+    box-sizing: border-box;
+    border-radius: 15px;
+}
+
+.registerForm input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+}
+
+.btnSubmit {
+    width: 100%;
+    height: 46px;
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: 8px;
+    color: var(--color-bg-dark);
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 1.25rem;
+    transition: 0.3s ease;
+}
+
+.btnSubmit:hover {
+    opacity: 0.9;
+}
+
+.loginRedirect {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.loginRedirect a {
+    color: var(--color-secondary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.loginRedirect a:hover {
+    opacity: 0.9;
+    text-decoration: underline;
+}
