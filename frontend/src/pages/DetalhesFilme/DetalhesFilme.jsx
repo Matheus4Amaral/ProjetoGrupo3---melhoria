@@ -7,10 +7,10 @@ import BannerFilme from "../../components/BannerFilme";
 import PosterFilme from "../../components/PosterFilme";
 import InformacoesFilme from "../../components/InformacoesFilme";
 import SinopseFilme from "../../components/SinopseFilme";
-import { adicionarNaLista, estaNaLista } from "../../utils/minhaLista";
-import { removerDaLista } from "../../utils/minhaLista";
+import { adicionarNaLista, estaNaLista, removerDaLista } from "../../utils/minhaLista";
 import { marcarComoAssistido, desmarcarAssistido, estaAssistido } from "../../utils/assistidos";
 import ComentariosFilme from "../../components/ComentariosFilme";
+import { useToast } from "../../components/ToastContext.jsx";
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const IMG_BASE = "https://image.tmdb.org/t/p/w300";
@@ -18,6 +18,7 @@ const IMG_BASE = "https://image.tmdb.org/t/p/w300";
 function DetalhesFilme() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const mostrarToast = useToast();
 
   const [filme, setFilme] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -57,6 +58,7 @@ function DetalhesFilme() {
     if (naLista) {
       removerDaLista(filme.id);
       setNaLista(false);
+      mostrarToast("Filme removido da sua lista", "sucesso");
     } else {
       adicionarNaLista({
         id: filme.id,
@@ -66,15 +68,18 @@ function DetalhesFilme() {
           : null,
         release_date: filme.release_date,
         genre_ids: filme.genres ? filme.genres.map((g) => g.id) : [],
+        tipo: "movie", // estava faltando — sem isso o item ia pro localStorage sem tipo
       });
       setNaLista(true);
+      mostrarToast("Filme adicionado!", "sucesso");
     }
   }
 
-function handleToggleAssistido() {
+  function handleToggleAssistido() {
     if (assistido) {
       desmarcarAssistido(filme.id);
       setAssistido(false);
+      mostrarToast("Filme removido dos assistidos", "sucesso");
     } else {
       marcarComoAssistido({
         id: filme.id,
@@ -87,6 +92,7 @@ function handleToggleAssistido() {
         tipo: "movie",
       });
       setAssistido(true);
+      mostrarToast("Filme marcado como assistido!", "sucesso");
     }
   }
 
@@ -124,7 +130,6 @@ function handleToggleAssistido() {
         <button
           className={assistido ? "btn-na-lista" : "btn-assistido"}
           onClick={handleToggleAssistido}
-          
         >
           {assistido ? "✓ Assistido (clique para remover)" : "Marcar como Assistido"}
         </button>

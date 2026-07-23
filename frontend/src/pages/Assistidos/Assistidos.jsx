@@ -5,22 +5,57 @@ import MovieCard from "../../components/MovieCard.jsx";
 import iconeLupa from "../../assets/icons/lupa.svg";
 import { obterAssistidos, desmarcarAssistido } from "../../utils/assistidos";
 
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+
 export default function Assistidos() {
   const [itens, setItens] = useState([]);
   const [busca, setBusca] = useState("");
+  const [generos, setGeneros] = useState([]);
+  const [generoSelecionado, setGeneroSelecionado] = useState("todos");
+  const [tipoConteudo, setTipoConteudo] = useState("movie"); // "movie" ou "tv"
 
   useEffect(() => {
     setItens(obterAssistidos());
   }, []);
+
+  // Busca gêneros do TMDB de acordo com o tipo selecionado
+  useEffect(() => {
+    async function buscarGeneros() {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/genre/${tipoConteudo}/list?api_key=${API_KEY}&language=pt-BR`
+        );
+        const data = await response.json();
+        setGeneros(data.genres || []);
+      } catch (error) {
+        console.error("Erro ao buscar gêneros:", error);
+      }
+    }
+
+    setGeneroSelecionado("todos"); // reseta o filtro ao trocar de tipo
+    buscarGeneros();
+  }, [tipoConteudo]);
 
   function removerAssistido(id) {
     desmarcarAssistido(id);
     setItens((prev) => prev.filter((item) => item.id !== id));
   }
 
-  const itensFiltrados = itens.filter((item) =>
-    item.title.toLowerCase().includes(busca.toLowerCase())
-  );
+  // Filtro por tipo + pesquisa + gênero
+  const itensFiltrados = itens.filter((item) => {
+    // itens antigos sem "tipo" são tratados como filme
+    const tipoDoItem = item.tipo || "movie";
+    const tipoOK = tipoDoItem === tipoConteudo;
+
+    const pesquisaOK = item.title.toLowerCase().includes(busca.toLowerCase());
+
+    const generoOK =
+      generoSelecionado === "todos" ||
+      (Array.isArray(item.genre_ids) &&
+        item.genre_ids.includes(Number(generoSelecionado)));
+
+    return tipoOK && pesquisaOK && generoOK;
+  });
 
   return (
     <>
@@ -45,6 +80,48 @@ export default function Assistidos() {
           </div>
         </header>
 
+        <div className={styles.tipoToggle}>
+          <span
+            className={`${styles.categoryPill} ${
+              tipoConteudo === "movie" ? styles.active : ""
+            }`}
+            onClick={() => setTipoConteudo("movie")}
+          >
+            Filmes
+          </span>
+          <span
+            className={`${styles.categoryPill} ${
+              tipoConteudo === "tv" ? styles.active : ""
+            }`}
+            onClick={() => setTipoConteudo("tv")}
+          >
+            Séries
+          </span>
+        </div>
+
+        <section className={styles.categoriesList}>
+          <span
+            className={`${styles.categoryPill} ${
+              generoSelecionado === "todos" ? styles.active : ""
+            }`}
+            onClick={() => setGeneroSelecionado("todos")}
+          >
+            Todos
+          </span>
+
+          {generos.map((genero) => (
+            <span
+              key={genero.id}
+              className={`${styles.categoryPill} ${
+                generoSelecionado === String(genero.id) ? styles.active : ""
+              }`}
+              onClick={() => setGeneroSelecionado(String(genero.id))}
+            >
+              {genero.name}
+            </span>
+          ))}
+        </section>
+
         <section className={styles.movieGrid}>
           {itensFiltrados.length > 0 ? (
             itensFiltrados.map((item) => (
@@ -55,7 +132,7 @@ export default function Assistidos() {
                 subtitulo={item.release_date}
                 poster={item.poster_path}
                 genre_ids={item.genre_ids}
-                tipo={item.tipo}
+                tipo={item.tipo || "movie"}
                 mostrarBotaoAdd={false}
                 mostrarBotaoRemover={true}
                 onRemover={removerAssistido}
@@ -69,11 +146,14 @@ export default function Assistidos() {
             </p>
           )}
         </section>
-           <footer className={styles.tmdbAttribution}>
-          <p>Este produto usa a API do TMDB, mas não é endossado ou certificado pelo TMDB.</p>
-       </footer>
-      </main>
 
+        <footer className={styles.tmdbAttribution}>
+          <p>
+            Este produto usa a API do TMDB, mas não é endossado ou
+            certificado pelo TMDB.
+          </p>
+        </footer>
+      </main>
     </>
   );
 }

@@ -90,3 +90,38 @@
   font-size: 0.75rem;
   text-align: center;
 }
+.categoriesList {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.categoryPill {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-muted);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.categoryPill:hover {
+  background-color: #292a36;
+  color: var(--color-text);
+}
+
+.categoryPill.active {
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+  font-weight: bold;
+}
+
+.tipoToggle {
+  margin-bottom: 25px;
+}
+
+.tipoToggle .categoryPill {
+  margin-right: 10px;
+}

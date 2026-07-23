@@ -11,6 +11,7 @@ import { adicionarNaLista, estaNaLista, removerDaLista } from "../../utils/minha
 import { marcarComoAssistido, desmarcarAssistido, estaAssistido } from "../../utils/assistidos";
 import ComentariosFilme from "../../components/ComentariosFilme";
 import TemporadasSerie from "../../components/TemporadasSerie";
+import {useToast} from "../../components/ToastContext.jsx"
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const IMG_BASE = "https://image.tmdb.org/t/p/w300";
@@ -18,6 +19,7 @@ const IMG_BASE = "https://image.tmdb.org/t/p/w300";
 function DetalhesSeries() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const mostrarToast = useToast();
 
   const [serie, setSerie] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -64,6 +66,7 @@ function DetalhesSeries() {
     if (naLista) {
       removerDaLista(serie.id);
       setNaLista(false);
+      mostrarToast("Série removida da sua lista", "sucesso")
     } else {
       adicionarNaLista({
         id: serie.id,
@@ -76,6 +79,7 @@ function DetalhesSeries() {
         tipo: "tv",
       });
       setNaLista(true);
+      mostrarToast("Série adicionada!", "sucesso");
     }
   }
 
@@ -83,6 +87,7 @@ function DetalhesSeries() {
     if (assistido) {
       desmarcarAssistido(serie.id);
       setAssistido(false);
+      mostrarToast("Série removida dos assistidos", "sucesso")
     } else {
       marcarComoAssistido({
         id: serie.id,
@@ -95,7 +100,8 @@ function DetalhesSeries() {
         tipo: "tv",
       });
       setAssistido(true);
-    }
+      mostrarToast("Série marcada como assistida!", "sucesso");
+          }
   }
 
   if (carregando) {
