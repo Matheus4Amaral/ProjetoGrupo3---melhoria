@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 import { adicionarNaLista } from "../utils/minhaLista";
+import { useToast } from "./ToastContext.jsx";
 
 export default function MovieCard({
   id,
@@ -13,8 +14,8 @@ export default function MovieCard({
   genre_ids,
   tipo = "movie",
 }) {
-
   const navigate = useNavigate();
+  const mostrarToast = useToast();
 
   function handleClick() {
     navigate(tipo === "tv" ? `/serie/${id}` : `/filme/${id}`);
@@ -23,7 +24,7 @@ export default function MovieCard({
   function handleAdicionar(e) {
     e.stopPropagation();
 
-    adicionarNaLista({
+    const resultado = adicionarNaLista({
       id,
       title: titulo,
       poster_path: poster,
@@ -31,6 +32,8 @@ export default function MovieCard({
       genre_ids,
       tipo,
     });
+
+    mostrarToast(resultado.mensagem, resultado.sucesso ? "sucesso" : "erro");
   }
 
   function handleRemover(e) {
@@ -39,10 +42,7 @@ export default function MovieCard({
   }
 
   return (
-    <div
-      className={styles.movieItem}
-      onClick={handleClick}
-    >
+    <div className={styles.movieItem} onClick={handleClick}>
       <div
         className={styles.moviePoster}
         style={
@@ -71,9 +71,7 @@ export default function MovieCard({
       <p>{titulo}</p>
 
       {subtitulo && (
-        <span className={styles.movieSubtitulo}>
-          {subtitulo}
-        </span>
+        <span className={styles.movieSubtitulo}>{subtitulo}</span>
       )}
     </div>
   );

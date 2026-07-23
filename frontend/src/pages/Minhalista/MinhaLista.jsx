@@ -12,47 +12,53 @@ export default function MinhaLista() {
   const [busca, setBusca] = useState("");
   const [generos, setGeneros] = useState([]);
   const [generoSelecionado, setGeneroSelecionado] = useState("todos");
+  const [tipoConteudo, setTipoConteudo] = useState("movie"); // "movie" ou "tv"
 
-  // Carrega filmes salvos (da lista do usuário logado)
+  // Carrega itens salvos (da lista do usuário logado)
   useEffect(() => {
     setFilmes(obterLista());
   }, []);
 
-  // Busca gêneros do TMDB
+  // Busca gêneros do TMDB, de acordo com o tipo selecionado (filme ou série)
   useEffect(() => {
     async function buscarGeneros() {
       try {
         const response = await fetch(
-          `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=pt-BR`,
+          `https://api.themoviedb.org/3/genre/${tipoConteudo}/list?api_key=${API_KEY}&language=pt-BR`
         );
-
         const data = await response.json();
-
         setGeneros(data.genres || []);
       } catch (error) {
         console.error("Erro ao buscar gêneros:", error);
       }
     }
 
+    setGeneroSelecionado("todos"); // reseta o filtro ao trocar de tipo
     buscarGeneros();
-  }, []);
+  }, [tipoConteudo]);
 
-  // Remove filme da lista
+  // Remove item da lista
   function removerFilme(id) {
     removerDaLista(id);
     setFilmes((prev) => prev.filter((filme) => filme.id !== id));
   }
 
-  // Pesquisa + filtro gênero
+  // Filtro por tipo + pesquisa + gênero
   const filmesFiltrados = filmes.filter((filme) => {
-    const pesquisaOK = filme.title.toLowerCase().includes(busca.toLowerCase());
+    // itens antigos salvos sem o campo "tipo" são tratados como "movie"
+    const tipoDoItem = filme.tipo || "movie";
+    const tipoOK = tipoDoItem === tipoConteudo;
+
+    const pesquisaOK = filme.title
+      .toLowerCase()
+      .includes(busca.toLowerCase());
 
     const generoOK =
       generoSelecionado === "todos" ||
       (Array.isArray(filme.genre_ids) &&
         filme.genre_ids.includes(Number(generoSelecionado)));
 
-    return pesquisaOK && generoOK;
+    return tipoOK && pesquisaOK && generoOK;
   });
 
   return (
@@ -77,6 +83,25 @@ export default function MinhaLista() {
             />
           </div>
         </header>
+
+        <div className={styles.tipoToggle}>
+          <span
+            className={`${styles.categoryPill} ${
+              tipoConteudo === "movie" ? styles.active : ""
+            }`}
+            onClick={() => setTipoConteudo("movie")}
+          >
+            Filmes
+          </span>
+          <span
+            className={`${styles.categoryPill} ${
+              tipoConteudo === "tv" ? styles.active : ""
+            }`}
+            onClick={() => setTipoConteudo("tv")}
+          >
+            Séries
+          </span>
+        </div>
 
         <section className={styles.categoriesList}>
           <span
@@ -111,6 +136,7 @@ export default function MinhaLista() {
                 subtitulo={filme.release_date}
                 poster={filme.poster_path}
                 genre_ids={filme.genre_ids}
+                tipo={filme.tipo || "movie"}
                 mostrarBotaoAdd={false}
                 mostrarBotaoRemover={true}
                 onRemover={removerFilme}
@@ -120,12 +146,16 @@ export default function MinhaLista() {
             <p className={styles.statusMsg}>
               {filmes.length === 0
                 ? "Sua lista está vazia."
-                : "Nenhum filme encontrado."}
+                : "Nenhum item encontrado."}
             </p>
           )}
         </section>
+
         <footer className={styles.tmdbAttribution}>
-          <p>Este produto usa a API do TMDB, mas não é endossado ou certificado pelo TMDB.</p>
+          <p>
+            Este produto usa a API do TMDB, mas não é endossado ou
+            certificado pelo TMDB.
+          </p>
         </footer>
       </main>
     </>

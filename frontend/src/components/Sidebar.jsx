@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import iconeInicio from "../assets/icons/icone_inicio.svg";
@@ -9,6 +11,8 @@ import Icon from "../assets/flashview_simbolo.svg";
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [showModal, setShowModal] = useState(false);
 
   const usuarioNome = localStorage.getItem("usuarioNome") || "Usuário";
 
@@ -91,7 +95,11 @@ export default function Sidebar() {
           <div className="user-avatar">{iniciais}</div>
           <span className="user-name">{usuarioNome}</span>
 
-          <button className="btn-sair" onClick={handleSair} title="Sair">
+          <button
+            className="btn-sair"
+            onClick={() => setShowModal(true)}
+            title="Sair"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="18"
@@ -110,6 +118,29 @@ export default function Sidebar() {
           </button>
         </div>
       </div>
+
+      {/* MODAL DE CONFIRMAÇÃO DE LOGOUT — renderizado via Portal direto no body */}
+      {showModal &&
+        createPortal(
+          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+            <div className="modal-confirm" onClick={(e) => e.stopPropagation()}>
+              <h3>Sair da conta</h3>
+              <p>Tem certeza que deseja sair?</p>
+              <div className="modal-actions">
+                <button
+                  className="btn-cancelar"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button className="btn-confirmar-saida" onClick={handleSair}>
+                  Sair
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </aside>
   );
 }

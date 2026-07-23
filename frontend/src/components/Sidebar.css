@@ -1,7 +1,19 @@
+:root {
+  --color-primary: #FF9F1C;
+    --color-secondary: #2EC5B6;
+    --color-bg-dark: #181820;
+    --color-bg-card: #252837;
+    --color-text: #FFFFFF;
+    --color-text-muted: #9C9CAE;
+    --font-primary: "Kay Pho Du", serif;
+    --color-border: #2E313F;
+}
+
+
 .sidebar {
   width: 250px;
   height: 100vh;
-  background-color: #191a23;
+  background-color: var(--color-bg-dark);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -9,8 +21,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  border-right: 1px solid #292a36;
-  font-family: "Kay Pho Du";
+  border-right: 1px solid var(--color-border);
+  font-family: var(--font-primary);
 }
 
 .sidebar-logo {
@@ -28,13 +40,13 @@
 }
 
 .sidebar-logo h2 {
-  color: #fff;
+  color: var(--color-text);
   font-size: 1.4rem;
   margin: 0;
 }
 
 .sidebar-logo span {
-  color: #2ab8a1;
+  color: var(--color-secondary);
 }
 
 .sidebar-nav {
@@ -48,7 +60,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  color: #a1a1aa;
+  color: var(--color-text-muted);
   text-decoration: none;
   padding: 12px 1rem;
   border-radius: 8px;
@@ -58,14 +70,14 @@
 }
 
 .nav-item:hover {
-  background-color: #222431;
-  color: #fff;
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
 }
 
 .nav-item.active {
-  background-color: #292a36;
-  color: #fff;
-  border-left: 3px solid #f79c1e; /* Detalhe laranja */
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  border-left: 3px solid var(--color-primary); /* Detalhe laranja */
 }
 
 .sidebar-bottom {
@@ -82,7 +94,7 @@
   margin-left: auto;
   background: transparent;
   border: none;
-  color: #888;
+  color: var(--color-text-muted);
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;
@@ -98,7 +110,7 @@
 }
 
 .user-avatar {
-  background-color: #2ab8a1;
+  background-color: var(--color-secondary);
   color: #000;
   width: 35px;
   height: 35px;
@@ -111,7 +123,7 @@
 }
 
 .user-name {
-  color: #fff;
+  color: var(--color-text);
   font-size: 1rem;
 }
 
@@ -131,4 +143,76 @@
 .nav-item:hover .menu-icon,
 .nav-item.active .menu-icon {
   filter: brightness(0) invert(1);
+}
+
+.sidebar-bottom .user-avatar {
+    min-width: 35px;
+    min-height: 35px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0; /* equivalente a top/left/right/bottom: 0 */
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* valor bem alto pra garantir prioridade */
+}
+
+.modal-confirm {
+  background-color: var(--color-bg-dark);
+  padding: 24px;
+  border-radius:10px;
+  width :300px;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.modal-confirm h3 {
+  margin-bottom: 8px;
+}
+
+.modal-confirm p {
+  margin-bottom: 20px;
+  color: var(--color-text-muted);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-cancelar,
+.btn-confirmar-saida {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-cancelar {
+  background: transparent;
+  border: 2px var(--color-primary) solid;
+  color: var(--color-primary);
+}
+
+.btn-cancelar:hover {
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+}
+
+.btn-confirmar-saida {
+  background: transparent;
+  border: 2px var(--color-secondary) solid;
+  color: var(--color-secondary);
+}
+
+.btn-confirmar-saida:hover {
+ background-color: var(--color-secondary);
+  color: var(--color-bg-dark);
 }

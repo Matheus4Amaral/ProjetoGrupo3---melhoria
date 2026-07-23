@@ -126,3 +126,11 @@
   font-size: 0.75rem;
   text-align: center;
 }
+
+.tipoToggle {
+  margin-bottom: 25px;
+}
+
+.tipoToggle .categoryPill {
+  margin-right: 10px;
+}   
