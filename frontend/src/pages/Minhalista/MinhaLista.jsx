@@ -24,7 +24,7 @@ export default function MinhaLista() {
     async function buscarGeneros() {
       try {
         const response = await fetch(
-          `https://api.themoviedb.org/3/genre/${tipoConteudo}/list?api_key=${API_KEY}&language=pt-BR`
+          `https://api.themoviedb.org/3/genre/${tipoConteudo}/list?api_key=${API_KEY}&language=pt-BR`,
         );
         const data = await response.json();
         setGeneros(data.genres || []);
@@ -38,8 +38,8 @@ export default function MinhaLista() {
   }, [tipoConteudo]);
 
   // Remove item da lista
-   async function removerFilme(id) {
-    await removerDaLista(id);
+  async function removerFilme(id, tipo) {
+    await removerDaLista(id, tipo);
     setFilmes((prev) => prev.filter((filme) => filme.id !== id));
   }
 
@@ -49,9 +49,7 @@ export default function MinhaLista() {
     const tipoDoItem = filme.tipo || "movie";
     const tipoOK = tipoDoItem === tipoConteudo;
 
-    const pesquisaOK = filme.title
-      .toLowerCase()
-      .includes(busca.toLowerCase());
+    const pesquisaOK = filme.title.toLowerCase().includes(busca.toLowerCase());
 
     const generoOK =
       generoSelecionado === "todos" ||
@@ -153,8 +151,8 @@ export default function MinhaLista() {
 
         <footer className={styles.tmdbAttribution}>
           <p>
-            Este produto usa a API do TMDB, mas não é endossado ou
-            certificado pelo TMDB.
+            Este produto usa a API do TMDB, mas não é endossado ou certificado
+            pelo TMDB.
           </p>
         </footer>
       </main>
