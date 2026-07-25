@@ -282,14 +282,14 @@ app.get("/interacoes/assistidos/:usuarioId", async (req, res) => {
   }
 });
 
-// Status de UM filme específico para o usuário (usado em DetalhesFilme/DetalhesSeries)
-app.get("/interacoes/status/:usuarioId/:filmeId", async (req, res) => {
-  const { usuarioId, filmeId } = req.params;
+//Status de UM filme/série específico (usado em DetalhesFilme/DetalhesSeries)
+app.get("/interacoes/status/:usuarioId/:filmeId/:tipo", async (req, res) => {
+  const { usuarioId, filmeId, tipo } = req.params;
   try {
     const result = await pool.query(
       `SELECT esta_na_lista, assistido FROM interacoes
-       WHERE usuario_id = $1 AND filme_id = $2`,
-      [usuarioId, filmeId],
+       WHERE usuario_id = $1 AND filme_id = $2 AND tipo = $3`,
+      [usuarioId, filmeId, tipo],
     );
     const linha = result.rows[0];
     res.json({
@@ -312,8 +312,8 @@ app.post("/interacoes/lista/adicionar", async (req, res) => {
     await pool.query(
       `INSERT INTO interacoes (usuario_id, filme_id, tipo, esta_na_lista)
        VALUES ($1, $2, $3, true)
-       ON CONFLICT (usuario_id, filme_id)
-       DO UPDATE SET esta_na_lista = true, tipo = $3`,
+       ON CONFLICT (usuario_id, filme_id, tipo)
+       DO UPDATE SET esta_na_lista = true`,
       [usuarioId, filmeId, tipo || "movie"],
     );
     res.json({ mensagem: "Adicionado à lista." });
@@ -324,12 +324,12 @@ app.post("/interacoes/lista/adicionar", async (req, res) => {
 });
 
 app.post("/interacoes/lista/remover", async (req, res) => {
-  const { usuarioId, filmeId } = req.body;
+  const { usuarioId, filmeId, tipo } = req.body;
   try {
     await pool.query(
       `UPDATE interacoes SET esta_na_lista = false
-       WHERE usuario_id = $1 AND filme_id = $2`,
-      [usuarioId, filmeId],
+       WHERE usuario_id = $1 AND filme_id = $2 AND tipo = $3`,
+      [usuarioId, filmeId, tipo || "movie"],
     );
     res.json({ mensagem: "Removido da lista." });
   } catch (erro) {
@@ -348,8 +348,8 @@ app.post("/interacoes/assistido/adicionar", async (req, res) => {
     await pool.query(
       `INSERT INTO interacoes (usuario_id, filme_id, tipo, assistido)
        VALUES ($1, $2, $3, true)
-       ON CONFLICT (usuario_id, filme_id)
-       DO UPDATE SET assistido = true, tipo = $3`,
+       ON CONFLICT (usuario_id, filme_id, tipo)
+       DO UPDATE SET assistido = true`,
       [usuarioId, filmeId, tipo || "movie"],
     );
     res.json({ mensagem: "Marcado como assistido." });
@@ -360,12 +360,12 @@ app.post("/interacoes/assistido/adicionar", async (req, res) => {
 });
 
 app.post("/interacoes/assistido/remover", async (req, res) => {
-  const { usuarioId, filmeId } = req.body;
+  const { usuarioId, filmeId, tipo } = req.body;
   try {
     await pool.query(
       `UPDATE interacoes SET assistido = false
-       WHERE usuario_id = $1 AND filme_id = $2`,
-      [usuarioId, filmeId],
+       WHERE usuario_id = $1 AND filme_id = $2 AND tipo = $3`,
+      [usuarioId, filmeId, tipo || "movie"],
     );
     res.json({ mensagem: "Desmarcado como assistido." });
   } catch (erro) {
