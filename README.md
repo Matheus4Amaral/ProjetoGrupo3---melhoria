@@ -60,7 +60,9 @@ CREATE TABLE interacoes (
     usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
     filme_id INTEGER NOT NULL,
     esta_na_lista BOOLEAN DEFAULT TRUE,
-    UNIQUE(usuario_id, filme_id)
+    tipo VARCHAR(10) NOT NULL DEFAULT 'movie',
+    assistido BOOLEAN NOT NULL DEFAULT FALSE,
+    UNIQUE(usuario_id, filme_id, tipo)
 );
 
 -- 3. Avaliações (Comentários)
