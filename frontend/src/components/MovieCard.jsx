@@ -22,10 +22,11 @@ export default function MovieCard({
     navigate(tipo === "tv" ? `/serie/${id}` : `/filme/${id}`);
   }
 
-  function handleAdicionar(e) {
+  async function handleAdicionar(e) {
+    //adicinei async para poder usar await dentro da função para lidar com a adição à lista de forma assíncrona
     e.stopPropagation();
 
-    const resultado = adicionarNaLista({
+    const resultado = await adicionarNaLista({
       id,
       title: titulo,
       poster_path: poster,
