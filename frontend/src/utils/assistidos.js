@@ -1,32 +1,91 @@
-function getChaveStorage() {
-  const usuarioId = localStorage.getItem("usuarioId");
-  return usuarioId ? `assistidos_${usuarioId}` : "assistidos_convidado";
+const API_URL = "http://localhost:3000";
+const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const IMG_BASE = "https://image.tmdb.org/t/p/w300";
+
+function getUsuarioId() {
+  return localStorage.getItem("usuarioId");
 }
 
-export function obterAssistidos() {
-  return JSON.parse(localStorage.getItem(getChaveStorage())) || [];
+export async function obterAssistidosIds() {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) return [];
+
+  const response = await fetch(
+    `${API_URL}/interacoes/assistidos/${usuarioId}`,
+    {
+      cache: "no-store",
+    },
+  );
+  return response.json();
 }
 
-export function estaAssistido(id) {
-  const lista = obterAssistidos();
-  return lista.some((item) => item.id === id);
+export async function obterAssistidos() {
+  const referencias = await obterAssistidosIds();
+
+  const detalhes = await Promise.all(
+    referencias.map(async ({ filme_id, tipo }) => {
+      const endpoint = tipo === "tv" ? "tv" : "movie";
+      const resp = await fetch(
+        `https://api.themoviedb.org/3/${endpoint}/${filme_id}?api_key=${TMDB_KEY}&language=pt-BR`,
+      );
+      const data = await resp.json();
+
+      return {
+        id: data.id,
+        title: tipo === "tv" ? data.name : data.title,
+        poster_path: data.poster_path ? `${IMG_BASE}${data.poster_path}` : null,
+        release_date: tipo === "tv" ? data.first_air_date : data.release_date,
+        genre_ids: data.genres ? data.genres.map((g) => g.id) : [],
+        tipo,
+      };
+    }),
+  );
+
+  return detalhes;
 }
 
-export function marcarComoAssistido(itemData) {
-  const lista = obterAssistidos();
-  const jaExiste = lista.some((item) => item.id === itemData.id);
+export async function estaAssistido(id) {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) return false;
 
-  if (jaExiste) {
-    return false;
+  const response = await fetch(
+    `${API_URL}/interacoes/status/${usuarioId}/${id}`,
+    { cache: "no-store" },
+  );
+  const data = await response.json();
+  return data.assistido;
+}
+
+export async function marcarComoAssistido(itemData) {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) {
+    return { sucesso: false, mensagem: "Você precisa estar logado." };
   }
 
-  lista.push(itemData);
-  localStorage.setItem(getChaveStorage(), JSON.stringify(lista));
-  return true;
+  const response = await fetch(`${API_URL}/interacoes/assistido/adicionar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      usuarioId,
+      filmeId: itemData.id,
+      tipo: itemData.tipo || "movie",
+    }),
+  });
+
+  if (!response.ok) {
+    return { sucesso: false, mensagem: "Erro ao marcar como assistido." };
+  }
+
+  return { sucesso: true, mensagem: "Marcado como assistido!" };
 }
 
-export function desmarcarAssistido(id) {
-  const lista = obterAssistidos();
-  const novaLista = lista.filter((item) => item.id !== id);
-  localStorage.setItem(getChaveStorage(), JSON.stringify(novaLista));
+export async function desmarcarAssistido(id) {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) return;
+
+  await fetch(`${API_URL}/interacoes/assistido/remover`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ usuarioId, filmeId: id }),
+  });
 }

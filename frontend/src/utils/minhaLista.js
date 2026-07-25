@@ -1,42 +1,90 @@
-function getChaveStorage() {
-  const usuarioId = localStorage.getItem("usuarioId");
-  return usuarioId ? `minhaLista_${usuarioId}` : "minhaLista_convidado";
+const API_URL = "http://localhost:3000";
+const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const IMG_BASE = "https://image.tmdb.org/t/p/w300";
+
+function getUsuarioId() {
+  return localStorage.getItem("usuarioId");
 }
 
-export function obterLista() {
-  return JSON.parse(localStorage.getItem(getChaveStorage())) || [];
+// Só os IDs salvos no banco — rápido, sem chamar o TMDB. Usado para contadores.
+export async function obterListaIds() {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) return [];
+
+  const response = await fetch(`${API_URL}/interacoes/lista/${usuarioId}`, {
+    cache: "no-store",
+  });
+  return response.json(); // [{ filme_id, tipo }]
 }
 
-export function estaNaLista(id) {
-  const lista = obterLista();
-  return lista.some((filme) => filme.id === id);
+// Lista completa, já com dados prontos pra exibir (busca cada item no TMDB)
+export async function obterLista() {
+  const referencias = await obterListaIds();
+
+  const detalhes = await Promise.all(
+    referencias.map(async ({ filme_id, tipo }) => {
+      const endpoint = tipo === "tv" ? "tv" : "movie";
+      const resp = await fetch(
+        `https://api.themoviedb.org/3/${endpoint}/${filme_id}?api_key=${TMDB_KEY}&language=pt-BR`,
+      );
+      const data = await resp.json();
+
+      return {
+        id: data.id,
+        title: tipo === "tv" ? data.name : data.title,
+        poster_path: data.poster_path ? `${IMG_BASE}${data.poster_path}` : null,
+        release_date: tipo === "tv" ? data.first_air_date : data.release_date,
+        genre_ids: data.genres ? data.genres.map((g) => g.id) : [],
+        tipo,
+      };
+    }),
+  );
+
+  return detalhes;
 }
 
-export function adicionarNaLista(filmeData) {
-  const lista = obterLista();
-  const filmeExiste = lista.some((filme) => filme.id === filmeData.id);
-  const ehSerie = filmeData.tipo === "tv";
+export async function estaNaLista(id) {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) return false;
 
-  if (filmeExiste) {
-    return {
-      sucesso: false,
-      mensagem: ehSerie
-        ? "Essa série já está na sua lista!"
-        : "Esse filme já está na sua lista!",
-    };
+  const response = await fetch(
+    `${API_URL}/interacoes/status/${usuarioId}/${id}`,
+    { cache: "no-store" },
+  );
+  const data = await response.json();
+  return data.naLista;
+}
+
+export async function adicionarNaLista(itemData) {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) {
+    return { sucesso: false, mensagem: "Você precisa estar logado." };
   }
 
-  lista.push(filmeData);
-  localStorage.setItem(getChaveStorage(), JSON.stringify(lista));
+  const response = await fetch(`${API_URL}/interacoes/lista/adicionar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      usuarioId,
+      filmeId: itemData.id,
+      tipo: itemData.tipo || "movie",
+    }),
+  });
 
-  return {
-    sucesso: true,
-    mensagem: ehSerie ? "Série adicionada!" : "Filme adicionado!",
-  };
+  if (!response.ok) {
+    return { sucesso: false, mensagem: "Erro ao adicionar à lista." };
+  }
+
+  return { sucesso: true, mensagem: "Adicionado à Minha Lista!" };
 }
 
-export function removerDaLista(id) {
-  const lista = obterLista();
-  const novaLista = lista.filter((filme) => filme.id !== id);
-  localStorage.setItem(getChaveStorage(), JSON.stringify(novaLista));
+export async function removerDaLista(id) {
+  const usuarioId = getUsuarioId();
+  if (!usuarioId) return;
+
+  await fetch(`${API_URL}/interacoes/lista/remover`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ usuarioId, filmeId: id }),
+  });
 }
