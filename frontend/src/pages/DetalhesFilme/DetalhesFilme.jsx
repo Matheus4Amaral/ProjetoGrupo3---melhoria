@@ -7,8 +7,16 @@ import BannerFilme from "../../components/BannerFilme";
 import PosterFilme from "../../components/PosterFilme";
 import InformacoesFilme from "../../components/InformacoesFilme";
 import SinopseFilme from "../../components/SinopseFilme";
-import { adicionarNaLista, estaNaLista, removerDaLista } from "../../utils/minhaLista";
-import { marcarComoAssistido, desmarcarAssistido, estaAssistido } from "../../utils/assistidos";
+import {
+  adicionarNaLista,
+  estaNaLista,
+  removerDaLista,
+} from "../../utils/minhaLista";
+import {
+  marcarComoAssistido,
+  desmarcarAssistido,
+  estaAssistido,
+} from "../../utils/assistidos";
 import ComentariosFilme from "../../components/ComentariosFilme";
 import { useToast } from "../../components/ToastContext.jsx";
 
@@ -42,8 +50,8 @@ function DetalhesFilme() {
         const data = await response.json();
 
         setFilme(data);
-        setNaLista(estaNaLista(data.id));
-        setAssistido(estaAssistido(data.id));
+        setNaLista(await estaNaLista(data.id)); //adicionando await para garantir que a verificação seja concluída antes de atualizar o estado
+        setAssistido(await estaAssistido(data.id));
       } catch (err) {
         setErro(err.message);
       } finally {
@@ -54,13 +62,13 @@ function DetalhesFilme() {
     carregarFilme();
   }, [id]);
 
-  function handleToggleMinhaLista() {
+  async function handleToggleMinhaLista() {
     if (naLista) {
-      removerDaLista(filme.id);
+      await removerDaLista(filme.id);
       setNaLista(false);
       mostrarToast("Filme removido da sua lista", "sucesso");
     } else {
-      adicionarNaLista({
+      await adicionarNaLista({
         id: filme.id,
         title: filme.title,
         poster_path: filme.poster_path
@@ -75,13 +83,13 @@ function DetalhesFilme() {
     }
   }
 
-  function handleToggleAssistido() {
+  async function handleToggleAssistido() {
     if (assistido) {
-      desmarcarAssistido(filme.id);
+      await desmarcarAssistido(filme.id);
       setAssistido(false);
       mostrarToast("Filme removido dos assistidos", "sucesso");
     } else {
-      marcarComoAssistido({
+      await marcarComoAssistido({
         id: filme.id,
         title: filme.title,
         poster_path: filme.poster_path
@@ -131,7 +139,9 @@ function DetalhesFilme() {
           className={assistido ? "btn-na-lista" : "btn-assistido"}
           onClick={handleToggleAssistido}
         >
-          {assistido ? "✓ Assistido (clique para remover)" : "Marcar como Assistido"}
+          {assistido
+            ? "✓ Assistido (clique para remover)"
+            : "Marcar como Assistido"}
         </button>
       </div>
 

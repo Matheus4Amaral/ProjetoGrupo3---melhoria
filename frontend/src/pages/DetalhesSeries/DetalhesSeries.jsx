@@ -50,8 +50,8 @@ function DetalhesSeries() {
         };
 
         setSerie(serieNormalizada);
-        setNaLista(estaNaLista(data.id));
-        setAssistido(estaAssistido(data.id));
+        setNaLista(await estaNaLista(data.id));
+        setAssistido(await estaAssistido(data.id));
       } catch (err) {
         setErro(err.message);
       } finally {
@@ -62,13 +62,13 @@ function DetalhesSeries() {
     carregarSerie();
   }, [id]);
 
-  function handleToggleMinhaLista() {
+  async function handleToggleMinhaLista() {
     if (naLista) {
-      removerDaLista(serie.id);
+      await removerDaLista(serie.id);
       setNaLista(false);
       mostrarToast("Série removida da sua lista", "sucesso")
     } else {
-      adicionarNaLista({
+      await adicionarNaLista({
         id: serie.id,
         title: serie.title,
         poster_path: serie.poster_path
@@ -83,13 +83,13 @@ function DetalhesSeries() {
     }
   }
 
-  function handleToggleAssistido() {
+  async function handleToggleAssistido() {
     if (assistido) {
-      desmarcarAssistido(serie.id);
+      await desmarcarAssistido(serie.id);
       setAssistido(false);
       mostrarToast("Série removida dos assistidos", "sucesso")
     } else {
-      marcarComoAssistido({
+      await marcarComoAssistido({
         id: serie.id,
         title: serie.title,
         poster_path: serie.poster_path
