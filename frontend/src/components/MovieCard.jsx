@@ -45,7 +45,7 @@ export default function MovieCard({
 
   function handleRemover(e) {
     e.stopPropagation();
-    onRemover?.(id);
+    onRemover?.(id, tipo); //passei o id e o tipo para a função de remoção, para que o pai saiba qual item remover da lista.
 
     // NOVO: Notifica o pai após a remoção para recalcular os contadores automaticamente.
     aoAtualizarLista?.();
