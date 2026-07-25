@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { obterLista } from "../../utils/minhaLista";
-import { obterAssistidos } from "../../utils/assistidos";
+import { obterListaIds } from "../../utils/minhaLista";
+import { obterAssistidosIds } from "../../utils/assistidos";
 import { Link } from "react-router-dom";
 
 import Sidebar from "../../components/Sidebar.jsx";
@@ -20,19 +20,32 @@ export default function Inicio() {
   const [filmesPopulares, setFilmesPopulares] = useState([]);
   const [generos, setGeneros] = useState([]);
   const [generoSelecionado, setGeneroSelecionado] = useState("todos");
-  const usuarioNome = localStorage.getItem("usuarioNome") || "Usuário";
-  //onst quantidadeQueroAssistir = obterLista().length;
-  //const quantidadeAssistidos = obterAssistidos().length;
   const [tipoConteudo, setTipoConteudo] = useState("movie");
+  const usuarioNome = localStorage.getItem("usuarioNome") || "Usuário";
 
-  const [quantidadeQueroAssistir, setQuantidadeQueroAssistir] = useState(() => obterLista().length,);
-  const [quantidadeAssistidos, setQuantidadeAssistidos] = useState(() => obterAssistidos().length,);
+  // Começam em 0 — o valor real só chega depois que o useEffect
+  // (lá embaixo) buscar do banco, já que agora é uma chamada assíncrona
+  const [quantidadeQueroAssistir, setQuantidadeQueroAssistir] = useState(0);
+  const [quantidadeAssistidos, setQuantidadeAssistidos] = useState(0);
 
-  // Recalcula os dois contadores lendo o localStorage de novo
-  function atualizarContadores() {
-    setQuantidadeQueroAssistir(obterLista().length);
-    setQuantidadeAssistidos(obterAssistidos().length);
+  // Busca no banco (via API) quantos itens existem em cada lista, e
+  // atualiza os dois contadores. Chamada tanto ao carregar a página
+  // quanto sempre que o MovieCard adicionar/remover algo.
+  async function atualizarContadores() {
+    const [lista, assistidos] = await Promise.all([
+      obterListaIds(),
+      obterAssistidosIds(),
+    ]);
+    setQuantidadeQueroAssistir(lista.length);
+    setQuantidadeAssistidos(assistidos.length);
   }
+
+  // NOVO: dispara a busca dos contadores assim que a página monta.
+  // Sem esse useEffect, os contadores ficariam parados em 0 pra sempre,
+  // já que "atualizarContadores" só é chamada aqui e dentro dos MovieCard.
+  useEffect(() => {
+    atualizarContadores();
+  }, []);
 
   const estatisticas = [
     {
@@ -50,9 +63,6 @@ export default function Inicio() {
   ];
 
   // Carrega os filmes/séries populares (ou filtrados por gênero).
-  // A flag "ativo" evita que uma resposta desatualizada (ex: de um
-  // gênero que não existe mais no tipo atual) sobrescreva um
-  // resultado mais recente.
   useEffect(() => {
     let ativo = true;
 
@@ -94,7 +104,7 @@ export default function Inicio() {
   }, [generoSelecionado, tipoConteudo]);
 
   // Carrega os gêneros do tipo atual e reseta o filtro sempre que o
-  // tipo (filme/série) muda, já que os IDs de gênero são diferentes.
+  // tipo (filme/série) muda.
   useEffect(() => {
     let ativo = true;
 
@@ -114,7 +124,7 @@ export default function Inicio() {
       }
     }
 
-    setGeneroSelecionado("todos"); // reseta o filtro ao trocar de tipo
+    setGeneroSelecionado("todos");
     carregarGeneros();
 
     return () => {
@@ -122,8 +132,7 @@ export default function Inicio() {
     };
   }, [tipoConteudo]);
 
-  // Pesquisa com debounce, refeita automaticamente se o tipo mudar
-  // enquanto já existe um termo de busca digitado.
+  // Pesquisa com debounce.
   useEffect(() => {
     if (busca.trim() === "") {
       setResultadoBusca([]);
@@ -168,7 +177,6 @@ export default function Inicio() {
       <Sidebar />
 
       <main className={styles.inicioContent}>
-        {/* Mudar tipo (movie/tv) */}
         <div className={styles.tipoToggle}>
           <span
             className={`${styles.categoryPill} ${
@@ -189,7 +197,6 @@ export default function Inicio() {
           </span>
         </div>
 
-        {/* PESQUISA */}
         <header className={styles.inicioHeader}>
           <div className={styles.searchBar}>
             <img
@@ -211,7 +218,6 @@ export default function Inicio() {
           </div>
         </header>
 
-        {/* RESULTADOS DA BUSCA */}
         {resultadoBusca.length > 0 && (
           <section className={styles.contentSection}>
             <div className={styles.sectionHeader}>
@@ -225,14 +231,10 @@ export default function Inicio() {
                   id={filme.id}
                   titulo={filme.titulo}
                   subtitulo={
-                    filme.dataLancamento
-                      ? filme.dataLancamento.slice(0, 4)
-                      : ""
+                    filme.dataLancamento ? filme.dataLancamento.slice(0, 4) : ""
                   }
                   poster={
-                    filme.poster_path
-                      ? `${IMG_BASE}${filme.poster_path}`
-                      : null
+                    filme.poster_path ? `${IMG_BASE}${filme.poster_path}` : null
                   }
                   genre_ids={filme.genre_ids}
                   mostrarBotaoAdd={true}
@@ -244,7 +246,6 @@ export default function Inicio() {
           </section>
         )}
 
-        {/* BOAS-VINDAS */}
         <section className={styles.welcomeSection}>
           <span className={styles.userName}>{usuarioNome}</span>
 
@@ -262,7 +263,6 @@ export default function Inicio() {
           </div>
         </section>
 
-        {/* POPULARES */}
         <section className={styles.contentSection}>
           <div className={styles.sectionHeader}>
             <h3>Populares no Catálogo</h3>
@@ -293,7 +293,6 @@ export default function Inicio() {
           </div>
         </section>
 
-        {/* CATEGORIAS */}
         <section className={styles.contentSection}>
           <div className={styles.sectionHeader}>
             <h3>Explorar por Categoria</h3>
