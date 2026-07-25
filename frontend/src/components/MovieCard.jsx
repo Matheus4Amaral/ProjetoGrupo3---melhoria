@@ -13,6 +13,7 @@ export default function MovieCard({
   onRemover,
   genre_ids,
   tipo = "movie",
+  aoAtualizarLista, //Callback para notificar o componente pai sobre (ex: Inicio.jsx) mudanças na lista (atualiza contadores sem F5).
 }) {
   const navigate = useNavigate();
   const mostrarToast = useToast();
@@ -34,11 +35,19 @@ export default function MovieCard({
     });
 
     mostrarToast(resultado.mensagem, resultado.sucesso ? "sucesso" : "erro");
+
+    // NOVO: Notifica o pai para atualizar contadores apenas se a adição for bem-sucedida (item não repetido).
+    if (resultado.sucesso) {
+      aoAtualizarLista?.();
+    }
   }
 
   function handleRemover(e) {
     e.stopPropagation();
     onRemover?.(id);
+
+    // NOVO: Notifica o pai após a remoção para recalcular os contadores automaticamente.
+    aoAtualizarLista?.();
   }
 
   return (
@@ -70,9 +79,7 @@ export default function MovieCard({
 
       <p>{titulo}</p>
 
-      {subtitulo && (
-        <span className={styles.movieSubtitulo}>{subtitulo}</span>
-      )}
+      {subtitulo && <span className={styles.movieSubtitulo}>{subtitulo}</span>}
     </div>
   );
 }

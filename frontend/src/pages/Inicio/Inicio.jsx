@@ -21,9 +21,18 @@ export default function Inicio() {
   const [generos, setGeneros] = useState([]);
   const [generoSelecionado, setGeneroSelecionado] = useState("todos");
   const usuarioNome = localStorage.getItem("usuarioNome") || "Usuário";
-  const quantidadeQueroAssistir = obterLista().length;
-  const quantidadeAssistidos = obterAssistidos().length;
+  //onst quantidadeQueroAssistir = obterLista().length;
+  //const quantidadeAssistidos = obterAssistidos().length;
   const [tipoConteudo, setTipoConteudo] = useState("movie");
+
+  const [quantidadeQueroAssistir, setQuantidadeQueroAssistir] = useState(() => obterLista().length,);
+  const [quantidadeAssistidos, setQuantidadeAssistidos] = useState(() => obterAssistidos().length,);
+
+  // Recalcula os dois contadores lendo o localStorage de novo
+  function atualizarContadores() {
+    setQuantidadeQueroAssistir(obterLista().length);
+    setQuantidadeAssistidos(obterAssistidos().length);
+  }
 
   const estatisticas = [
     {
@@ -228,6 +237,7 @@ export default function Inicio() {
                   genre_ids={filme.genre_ids}
                   mostrarBotaoAdd={true}
                   tipo={tipoConteudo}
+                  aoAtualizarLista={atualizarContadores}
                 />
               ))}
             </div>
@@ -277,6 +287,7 @@ export default function Inicio() {
                 genre_ids={filme.genre_ids}
                 mostrarBotaoAdd={true}
                 tipo={tipoConteudo}
+                aoAtualizarLista={atualizarContadores}
               />
             ))}
           </div>
