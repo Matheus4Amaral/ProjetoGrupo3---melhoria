@@ -23,7 +23,7 @@ export default function Assistidos() {
     async function buscarGeneros() {
       try {
         const response = await fetch(
-          `https://api.themoviedb.org/3/genre/${tipoConteudo}/list?api_key=${API_KEY}&language=pt-BR`
+          `https://api.themoviedb.org/3/genre/${tipoConteudo}/list?api_key=${API_KEY}&language=pt-BR`,
         );
         const data = await response.json();
         setGeneros(data.genres || []);
@@ -36,8 +36,8 @@ export default function Assistidos() {
     buscarGeneros();
   }, [tipoConteudo]);
 
-  async function removerAssistido(id) {
-    await desmarcarAssistido(id);
+  async function removerAssistido(id, tipo) {
+    await desmarcarAssistido(id, tipo);
     setItens((prev) => prev.filter((item) => item.id !== id));
   }
 
@@ -149,8 +149,8 @@ export default function Assistidos() {
 
         <footer className={styles.tmdbAttribution}>
           <p>
-            Este produto usa a API do TMDB, mas não é endossado ou
-            certificado pelo TMDB.
+            Este produto usa a API do TMDB, mas não é endossado ou certificado
+            pelo TMDB.
           </p>
         </footer>
       </main>
