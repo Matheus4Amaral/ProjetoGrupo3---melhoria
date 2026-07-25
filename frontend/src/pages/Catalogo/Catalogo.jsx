@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 import Sidebar from "../../components/Sidebar.jsx";
 import MovieCard from "../../components/MovieCard.jsx";
+import SeriesCard from "../../components/SeriesCard.jsx";
 import styles from "./Catalogo.module.css";
 
 import iconeLupa from "../../assets/icons/lupa.svg";
@@ -149,18 +150,38 @@ function Catalogo () {
                           {!carregando && !erro && (
 
                             <div className={styles.moviesGrid}>
-                                    {itens.map((item) => (
-                                 <MovieCard
-                                    key={item.id}
-                                    id={item.id}
-                                    titulo={item.titulo}
-                                    subtitulo={item.dataLancamento ? item.dataLancamento.slice(0, 4) : ""}
-                                    poster={item.poster_path ? `${IMG_BASE}${item.poster_path}` : null}
-                                    genre_ids={item.genre_ids}
-                                    mostrarBotaoAdd={true}
-                                    tipo={tipoConteudo}
-                                />
-                                ))}
+                                {itens.map((item) => tipoConteudo === "movie" ? (
+                                    <MovieCard
+                                        key={item.id}
+                                        id={item.id}
+                                        titulo={item.titulo}
+                                        subtitulo={
+                                        item.dataLancamento
+                                            ? item.dataLancamento.slice(0, 4)
+                                            : ""
+                                        }
+                                        poster={
+                                        item.poster_path
+                                            ? `${IMG_BASE}${item.poster_path}`
+                                            : null
+                                        }
+                                        genre_ids={item.genre_ids}
+                                        mostrarBotaoAdd={true}
+                                        tipo="movie"
+                                    />
+                                ):(
+                                    <SeriesCard
+                                        key={item.id}
+                                        id={item.id}
+                                        titulo={item.titulo}
+                                        subtitulo={item.dataLancamento ? item.dataLancamento.slice(0, 4) : ""}
+                                        poster={item.poster_path ? `${IMG_BASE}${item.poster_path}` : null}
+                                        genre_ids={item.genre_ids}
+                                        mostrarBotaoAdd={true}
+                                        tipo="tv"
+                                    />
+                                    )
+                                )}
                             </div>
                             )}  
 

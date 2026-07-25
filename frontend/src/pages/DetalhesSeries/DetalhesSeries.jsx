@@ -76,6 +76,7 @@ function DetalhesSeries() {
         tipo: "tv",
       });
       setNaLista(true);
+      window.dispatchEvent(new Event("stats-atualizados"));
     }
   }
 

@@ -43,76 +43,54 @@ cd organizador-de-filmes-e-series
 ```
 
 ### 2. Configurar o Banco de Dados (PostgreSQL)
-Crie um banco de dados chamado com o nome da sua preferência e rode os seguintes scripts SQL para criar as tabelas necessárias:
+Crie um banco de dados chamado com o nome da sua preferência e rode os seguintes scripts SQL para criar as tabelas necessárias.:
 
-```sql
--- 1. Usuários
-CREATE TABLE usuarios (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    senha_hash VARCHAR(255) NOT NULL
-);
-
--- 2. Interações (Minha Lista)
-CREATE TABLE interacoes (
-    id SERIAL PRIMARY KEY,
-    usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
-    filme_id INTEGER NOT NULL,
-    esta_na_lista BOOLEAN DEFAULT TRUE,
-    UNIQUE(usuario_id, filme_id)
-);
-
--- 3. Avaliações (Comentários)
-CREATE TABLE avaliacoes (
-    id SERIAL PRIMARY KEY,
-    usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
-    filme_id INTEGER NOT NULL,
-    nota DECIMAL(2, 1) CHECK (nota >= 0 AND nota <= 5),
-    comentario TEXT,
-    data_avaliacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+```bash
+psql -U postgres -f backend/migration.sql
 ```
 
 ### 3. Configurar Variáveis de Ambiente
 Você precisará criar dois arquivos `.env` separados.
 
 **No diretório do Front-end (`frontend`):**
-Crie um arquivo `.env` na raiz da pasta `frontend` e adicione sua chave da API do TMDB:
-```env
-VITE_TMDB_API_KEY=sua_chave_aqui
-```
+Crie um arquivo `.env` na raiz da pasta `frontend` a partir do arquivo `.env.example` e adicione sua chave da API do TMDB
 
 **No diretório do Back-end (`backend`):**
-Crie um arquivo `.env` na raiz da pasta `backend` para configurar a conexão com o banco:
-```env
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=nome_do_seu_banco
-DB_PASS=sua_senha_aqui
-DB_PORT=5432
-```
+Crie um arquivo `.env` na raiz da pasta `backend` a partir do arquivo `.env.example` para configurar a conexão com o banco
 
 ### 4. Iniciando os Servidores
 
-O projeto é dividido em duas pastas. Você precisará rodar cada uma em um terminal separado.
+Antes de iniciar os servidores, voce precisará instalar as dependências.
 
-**Para iniciar o Front-end:**
-Abra um terminal na raiz do projeto, acesse a pasta do front-end, instale as dependências e inicie o Vite:
+**Para instalar dependências no Front-end:**
+Abra um terminal na raiz do projeto, acesse a pasta do front-end, instale as dependências:
 ```bash
 cd frontend
 npm install
-npm run dev
 ```
 
-**Para iniciar o Back-end:**
-Abra um segundo terminal na raiz do projeto, acesse a pasta do back-end, instale as dependências e inicie o servidor Node:
+**Para instalar dependências no Back-end:**
+Abra um terminal na raiz do projeto, acesse a pasta do back-end, instale as dependências:
 ```bash
 cd backend
 npm install
-node server.js
 ```
 
+**Para rodar ambos os servidores**
+O projeto é dividido em duas pastas. Você pode rodar ambas as pastas na pasta raiz do projeto com:
+```bash
+npm run dev
+```
+
+**Para rodar separadamente os servidores**
+Para rodar cada um separadamente, na pasta raiz do projeto, você pode rodar o seguinte comando:
+```bash
+npm run dev --prefix frontend
+```
+ou
+```bash
+npm run dev --prefix backend
+```
 ---
 
 ## Avisos de API

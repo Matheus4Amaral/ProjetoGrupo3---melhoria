@@ -102,6 +102,7 @@ export default function MinhaLista() {
         </section>
 
         <section className={styles.movieGrid}>
+          {}
           {filmesFiltrados.length > 0 ? (
             filmesFiltrados.map((filme) => (
               <MovieCard

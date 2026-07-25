@@ -11,13 +11,13 @@ export default function MovieCard({
   mostrarBotaoRemover,
   onRemover,
   genre_ids,
-  tipo = "movie",
+  tipo,
 }) {
 
   const navigate = useNavigate();
 
   function handleClick() {
-    navigate(tipo === "tv" ? `/serie/${id}` : `/filme/${id}`);
+    navigate(`/filme/${id}`);
   }
 
   function handleAdicionar(e) {
@@ -31,6 +31,8 @@ export default function MovieCard({
       genre_ids,
       tipo,
     });
+    //Dispara o evento para ser escutado no Inicio.jsx e atualizar os cards
+    window.dispatchEvent(new Event("stats-atualizados"));
   }
 
   function handleRemover(e) {

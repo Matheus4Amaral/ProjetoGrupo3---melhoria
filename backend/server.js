@@ -18,6 +18,10 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
+pool.on("connect", (client) => {
+  client.query("SET search_path TO flashview, public");
+});
+
 // Rota de Cadastro
 app.post("/cadastro", async (req, res) => {
   const { name, email, password } = req.body;

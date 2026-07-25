@@ -22,7 +22,7 @@
   margin-left: 250px;
   padding: 2rem 4rem;
   flex: 1;
-  max-width: 1200px;
+  max-width: 100%;
   font-family: "Kay Pho Du";
   font-weight: 600;
 }

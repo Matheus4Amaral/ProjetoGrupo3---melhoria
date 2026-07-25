@@ -68,6 +68,7 @@ function DetalhesFilme() {
         genre_ids: filme.genres ? filme.genres.map((g) => g.id) : [],
       });
       setNaLista(true);
+      window.dispatchEvent(new Event("stats-atualizados"));
     }
   }
 

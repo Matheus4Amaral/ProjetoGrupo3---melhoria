@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar.jsx";
 import StatCard from "../../components/StatCard.jsx";
 import MovieCard from "../../components/MovieCard.jsx";
+import SeriesCard from "../../components/SeriesCard.jsx";
 
 import styles from "./Inicio.module.css";
 
@@ -21,9 +22,11 @@ export default function Inicio() {
   const [generos, setGeneros] = useState([]);
   const [generoSelecionado, setGeneroSelecionado] = useState("todos");
   const usuarioNome = localStorage.getItem("usuarioNome") || "Usuário";
-  const quantidadeQueroAssistir = obterLista().length;
-  const quantidadeAssistidos = obterAssistidos().length;
+  // const quantidadeQueroAssistir = obterLista().length;
+  // const quantidadeAssistidos = obterAssistidos().length;
   const [tipoConteudo, setTipoConteudo] = useState("movie");
+  const [quantidadeQueroAssistir, setQuantidadeQueroAssistir] = useState(obterLista().length);
+  const [quantidadeAssistidos, setQuantidadeAssistidos] = useState(obterAssistidos().length);
 
   const estatisticas = [
     {
@@ -39,6 +42,20 @@ export default function Inicio() {
       corTexto: "text-cyan",
     },
   ];
+
+  //Effect para escutar evento ao atualizar na lista
+  useEffect(() => {
+    function atualizarStats() {
+      setQuantidadeQueroAssistir(obterLista().length);
+      setQuantidadeAssistidos(obterAssistidos().length);
+    }
+
+    window.addEventListener("stats-atualizados", atualizarStats);
+
+    return () => {
+      window.removeEventListener("stats-atualizados", atualizarStats);
+    };
+  }, []);
 
   // Carrega os filmes/séries populares (ou filtrados por gênero).
   // A flag "ativo" evita que uma resposta desatualizada (ex: de um
@@ -210,26 +227,38 @@ export default function Inicio() {
             </div>
 
             <div className={styles.moviesGrid}>
-              {resultadoBusca.map((filme) => (
-                <MovieCard
-                  key={filme.id}
-                  id={filme.id}
-                  titulo={filme.titulo}
-                  subtitulo={
-                    filme.dataLancamento
-                      ? filme.dataLancamento.slice(0, 4)
-                      : ""
-                  }
-                  poster={
-                    filme.poster_path
-                      ? `${IMG_BASE}${filme.poster_path}`
-                      : null
-                  }
-                  genre_ids={filme.genre_ids}
-                  mostrarBotaoAdd={true}
-                  tipo={tipoConteudo}
-                />
-              ))}
+              {resultadoBusca.map((item) => tipoConteudo === "movie" ? (
+                    <MovieCard
+                      key={item.id}
+                      id={item.id}
+                      titulo={item.titulo}
+                      subtitulo={
+                        item.dataLancamento
+                          ? item.dataLancamento.slice(0, 4)
+                          : ""
+                      }
+                      poster={
+                        item.poster_path
+                          ? `${IMG_BASE}${item.poster_path}`
+                          : null
+                      }
+                      genre_ids={item.genre_ids}
+                      mostrarBotaoAdd={true}
+                      tipo="movie"
+                    />
+                ):(
+                    <SeriesCard
+                      key={item.id}
+                      id={item.id}
+                      titulo={item.titulo}
+                      subtitulo={item.dataLancamento ? item.dataLancamento.slice(0, 4) : ""}
+                      poster={item.poster_path ? `${IMG_BASE}${item.poster_path}` : null}
+                      genre_ids={item.genre_ids}
+                      mostrarBotaoAdd={true}
+                      tipo="tv"
+                    />
+                  )
+              )}
             </div>
           </section>
         )}
@@ -263,22 +292,38 @@ export default function Inicio() {
           </div>
 
           <div className={styles.moviesGrid}>
-            {filmesPopulares.map((filme) => (
-              <MovieCard
-                key={filme.id}
-                id={filme.id}
-                titulo={filme.titulo}
-                subtitulo={
-                  filme.dataLancamento ? filme.dataLancamento.slice(0, 4) : ""
-                }
-                poster={
-                  filme.poster_path ? `${IMG_BASE}${filme.poster_path}` : null
-                }
-                genre_ids={filme.genre_ids}
-                mostrarBotaoAdd={true}
-                tipo={tipoConteudo}
-              />
-            ))}
+            {filmesPopulares.map((item) => tipoConteudo === "movie" ? (
+                    <MovieCard
+                      key={item.id}
+                      id={item.id}
+                      titulo={item.titulo}
+                      subtitulo={
+                        item.dataLancamento
+                          ? item.dataLancamento.slice(0, 4)
+                          : ""
+                      }
+                      poster={
+                        item.poster_path
+                          ? `${IMG_BASE}${item.poster_path}`
+                          : null
+                      }
+                      genre_ids={item.genre_ids}
+                      mostrarBotaoAdd={true}
+                      tipo="movie"
+                    />
+                ):(
+                    <SeriesCard
+                      key={item.id}
+                      id={item.id}
+                      titulo={item.titulo}
+                      subtitulo={item.dataLancamento ? item.dataLancamento.slice(0, 4) : ""}
+                      poster={item.poster_path ? `${IMG_BASE}${item.poster_path}` : null}
+                      genre_ids={item.genre_ids}
+                      mostrarBotaoAdd={true}
+                      tipo="tv"
+                    />
+                  )
+              )}
           </div>
         </section>
 
