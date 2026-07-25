@@ -44,12 +44,12 @@ export async function obterAssistidos() {
   return detalhes;
 }
 
-export async function estaAssistido(id) {
+export async function estaAssistido(id, tipo = "movie") {
   const usuarioId = getUsuarioId();
   if (!usuarioId) return false;
 
   const response = await fetch(
-    `${API_URL}/interacoes/status/${usuarioId}/${id}`,
+    `${API_URL}/interacoes/status/${usuarioId}/${id}/${tipo}`,
     { cache: "no-store" },
   );
   const data = await response.json();
@@ -79,13 +79,13 @@ export async function marcarComoAssistido(itemData) {
   return { sucesso: true, mensagem: "Marcado como assistido!" };
 }
 
-export async function desmarcarAssistido(id) {
+export async function desmarcarAssistido(id, tipo = "movie") {
   const usuarioId = getUsuarioId();
   if (!usuarioId) return;
 
   await fetch(`${API_URL}/interacoes/assistido/remover`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ usuarioId, filmeId: id }),
+    body: JSON.stringify({ usuarioId, filmeId: id, tipo }),
   });
 }

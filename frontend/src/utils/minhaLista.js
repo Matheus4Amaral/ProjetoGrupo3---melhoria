@@ -43,12 +43,12 @@ export async function obterLista() {
   return detalhes;
 }
 
-export async function estaNaLista(id) {
+export async function estaNaLista(id, tipo = "movie") {
   const usuarioId = getUsuarioId();
   if (!usuarioId) return false;
 
   const response = await fetch(
-    `${API_URL}/interacoes/status/${usuarioId}/${id}`,
+    `${API_URL}/interacoes/status/${usuarioId}/${id}/${tipo}`,
     { cache: "no-store" },
   );
   const data = await response.json();
@@ -78,13 +78,13 @@ export async function adicionarNaLista(itemData) {
   return { sucesso: true, mensagem: "Adicionado à Minha Lista!" };
 }
 
-export async function removerDaLista(id) {
+export async function removerDaLista(id, tipo = "movie") {
   const usuarioId = getUsuarioId();
   if (!usuarioId) return;
 
   await fetch(`${API_URL}/interacoes/lista/remover`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ usuarioId, filmeId: id }),
+    body: JSON.stringify({ usuarioId, filmeId: id, tipo }),
   });
 }
