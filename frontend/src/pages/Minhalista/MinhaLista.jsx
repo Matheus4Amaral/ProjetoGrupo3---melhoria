@@ -16,7 +16,7 @@ export default function MinhaLista() {
 
   // Carrega itens salvos (da lista do usuário logado)
   useEffect(() => {
-    setFilmes(obterLista());
+    obterLista().then(setFilmes);
   }, []);
 
   // Busca gêneros do TMDB, de acordo com o tipo selecionado (filme ou série)
@@ -38,8 +38,8 @@ export default function MinhaLista() {
   }, [tipoConteudo]);
 
   // Remove item da lista
-  function removerFilme(id) {
-    removerDaLista(id);
+   async function removerFilme(id) {
+    await removerDaLista(id);
     setFilmes((prev) => prev.filter((filme) => filme.id !== id));
   }
 

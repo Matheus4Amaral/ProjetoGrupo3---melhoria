@@ -15,7 +15,7 @@ export default function Assistidos() {
   const [tipoConteudo, setTipoConteudo] = useState("movie"); // "movie" ou "tv"
 
   useEffect(() => {
-    setItens(obterAssistidos());
+    obterAssistidos().then(setItens);
   }, []);
 
   // Busca gêneros do TMDB de acordo com o tipo selecionado
@@ -36,8 +36,8 @@ export default function Assistidos() {
     buscarGeneros();
   }, [tipoConteudo]);
 
-  function removerAssistido(id) {
-    desmarcarAssistido(id);
+  async function removerAssistido(id) {
+    await desmarcarAssistido(id);
     setItens((prev) => prev.filter((item) => item.id !== id));
   }
 
