@@ -193,10 +193,15 @@ app.post("/verificar-email", async (req, res) => {
   const { email } = req.body;
 
   try {
-    const result = await pool.query("SELECT id FROM usuarios WHERE email = $1", [email]);
+    const result = await pool.query(
+      "SELECT id FROM usuarios WHERE email = $1",
+      [email],
+    );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ erro: "Não encontramos uma conta com esse e-mail." });
+      return res
+        .status(404)
+        .json({ erro: "Não encontramos uma conta com esse e-mail." });
     }
 
     res.json({ mensagem: "E-mail encontrado." });
@@ -211,11 +216,16 @@ app.post("/redefinir-senha", async (req, res) => {
   const { email, novaSenha } = req.body;
 
   if (!novaSenha || novaSenha.length < 6) {
-    return res.status(400).json({ erro: "A senha precisa ter pelo menos 6 caracteres." });
+    return res
+      .status(400)
+      .json({ erro: "A senha precisa ter pelo menos 6 caracteres." });
   }
 
   try {
-    const usuarioExistente = await pool.query("SELECT id FROM usuarios WHERE email = $1", [email]);
+    const usuarioExistente = await pool.query(
+      "SELECT id FROM usuarios WHERE email = $1",
+      [email],
+    );
 
     if (usuarioExistente.rows.length === 0) {
       return res.status(404).json({ erro: "Usuário não encontrado." });
@@ -232,6 +242,134 @@ app.post("/redefinir-senha", async (req, res) => {
     res.json({ mensagem: "Senha redefinida com sucesso!" });
   } catch (erro) {
     console.error("Erro ao redefinir senha:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+// ========== MINHA LISTA / ASSISTIDOS (tabela interacoes) ==========
+
+// Retorna só os IDs+tipo salvos (rápido, sem consultar o TMDB) — usado
+// para contadores, onde só precisamos saber a QUANTIDADE
+app.get("/interacoes/lista/:usuarioId", async (req, res) => {
+  const { usuarioId } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT filme_id, tipo FROM interacoes
+       WHERE usuario_id = $1 AND esta_na_lista = true
+       ORDER BY id DESC`,
+      [usuarioId],
+    );
+    res.json(result.rows);
+  } catch (erro) {
+    console.error("Erro ao buscar lista:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+app.get("/interacoes/assistidos/:usuarioId", async (req, res) => {
+  const { usuarioId } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT filme_id, tipo FROM interacoes
+       WHERE usuario_id = $1 AND assistido = true
+       ORDER BY id DESC`,
+      [usuarioId],
+    );
+    res.json(result.rows);
+  } catch (erro) {
+    console.error("Erro ao buscar assistidos:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+// Status de UM filme específico para o usuário (usado em DetalhesFilme/DetalhesSeries)
+app.get("/interacoes/status/:usuarioId/:filmeId", async (req, res) => {
+  const { usuarioId, filmeId } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT esta_na_lista, assistido FROM interacoes
+       WHERE usuario_id = $1 AND filme_id = $2`,
+      [usuarioId, filmeId],
+    );
+    const linha = result.rows[0];
+    res.json({
+      naLista: linha?.esta_na_lista ?? false,
+      assistido: linha?.assistido ?? false,
+    });
+  } catch (erro) {
+    console.error("Erro ao buscar status:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+// Adiciona / remove da Minha Lista
+app.post("/interacoes/lista/adicionar", async (req, res) => {
+  const { usuarioId, filmeId, tipo } = req.body;
+  if (!usuarioId || !filmeId) {
+    return res.status(400).json({ erro: "Dados incompletos." });
+  }
+  try {
+    await pool.query(
+      `INSERT INTO interacoes (usuario_id, filme_id, tipo, esta_na_lista)
+       VALUES ($1, $2, $3, true)
+       ON CONFLICT (usuario_id, filme_id)
+       DO UPDATE SET esta_na_lista = true, tipo = $3`,
+      [usuarioId, filmeId, tipo || "movie"],
+    );
+    res.json({ mensagem: "Adicionado à lista." });
+  } catch (erro) {
+    console.error("Erro ao adicionar à lista:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+app.post("/interacoes/lista/remover", async (req, res) => {
+  const { usuarioId, filmeId } = req.body;
+  try {
+    await pool.query(
+      `UPDATE interacoes SET esta_na_lista = false
+       WHERE usuario_id = $1 AND filme_id = $2`,
+      [usuarioId, filmeId],
+    );
+    res.json({ mensagem: "Removido da lista." });
+  } catch (erro) {
+    console.error("Erro ao remover da lista:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+// Marca / desmarca como assistido
+app.post("/interacoes/assistido/adicionar", async (req, res) => {
+  const { usuarioId, filmeId, tipo } = req.body;
+  if (!usuarioId || !filmeId) {
+    return res.status(400).json({ erro: "Dados incompletos." });
+  }
+  try {
+    await pool.query(
+      `INSERT INTO interacoes (usuario_id, filme_id, tipo, assistido)
+       VALUES ($1, $2, $3, true)
+       ON CONFLICT (usuario_id, filme_id)
+       DO UPDATE SET assistido = true, tipo = $3`,
+      [usuarioId, filmeId, tipo || "movie"],
+    );
+    res.json({ mensagem: "Marcado como assistido." });
+  } catch (erro) {
+    console.error("Erro ao marcar como assistido:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+app.post("/interacoes/assistido/remover", async (req, res) => {
+  const { usuarioId, filmeId } = req.body;
+  try {
+    await pool.query(
+      `UPDATE interacoes SET assistido = false
+       WHERE usuario_id = $1 AND filme_id = $2`,
+      [usuarioId, filmeId],
+    );
+    res.json({ mensagem: "Desmarcado como assistido." });
+  } catch (erro) {
+    console.error("Erro ao desmarcar assistido:", erro);
     res.status(500).json({ erro: "Erro interno no servidor." });
   }
 });
