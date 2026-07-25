@@ -7,11 +7,19 @@ import BannerFilme from "../../components/BannerFilme";
 import PosterFilme from "../../components/PosterFilme";
 import InformacoesFilme from "../../components/InformacoesFilme";
 import SinopseFilme from "../../components/SinopseFilme";
-import { adicionarNaLista, estaNaLista, removerDaLista } from "../../utils/minhaLista";
-import { marcarComoAssistido, desmarcarAssistido, estaAssistido } from "../../utils/assistidos";
+import {
+  adicionarNaLista,
+  estaNaLista,
+  removerDaLista,
+} from "../../utils/minhaLista";
+import {
+  marcarComoAssistido,
+  desmarcarAssistido,
+  estaAssistido,
+} from "../../utils/assistidos";
 import ComentariosFilme from "../../components/ComentariosFilme";
 import TemporadasSerie from "../../components/TemporadasSerie";
-import {useToast} from "../../components/ToastContext.jsx"
+import { useToast } from "../../components/ToastContext.jsx";
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const IMG_BASE = "https://image.tmdb.org/t/p/w300";
@@ -50,8 +58,8 @@ function DetalhesSeries() {
         };
 
         setSerie(serieNormalizada);
-        setNaLista(await estaNaLista(data.id));
-        setAssistido(await estaAssistido(data.id));
+        setNaLista(await estaNaLista(data.id, "tv"));
+        setAssistido(await estaAssistido(data.id, "tv"));
       } catch (err) {
         setErro(err.message);
       } finally {
@@ -64,9 +72,9 @@ function DetalhesSeries() {
 
   async function handleToggleMinhaLista() {
     if (naLista) {
-      await removerDaLista(serie.id);
+      await removerDaLista(serie.id, "tv"); // <- adiciona "tv" aqui
       setNaLista(false);
-      mostrarToast("Série removida da sua lista", "sucesso")
+      mostrarToast("Série removida da sua lista", "sucesso");
     } else {
       await adicionarNaLista({
         id: serie.id,
@@ -85,9 +93,9 @@ function DetalhesSeries() {
 
   async function handleToggleAssistido() {
     if (assistido) {
-      await desmarcarAssistido(serie.id);
+      await desmarcarAssistido(serie.id, "tv");
       setAssistido(false);
-      mostrarToast("Série removida dos assistidos", "sucesso")
+      mostrarToast("Série removida dos assistidos", "sucesso");
     } else {
       await marcarComoAssistido({
         id: serie.id,
@@ -101,7 +109,7 @@ function DetalhesSeries() {
       });
       setAssistido(true);
       mostrarToast("Série marcada como assistida!", "sucesso");
-          }
+    }
   }
 
   if (carregando) {
@@ -139,15 +147,17 @@ function DetalhesSeries() {
           className={assistido ? "btn-na-lista" : "btn-assistido"}
           onClick={handleToggleAssistido}
         >
-          {assistido ? "✓ Assistido (clique para remover)" : "Marcar como Assistido"}
+          {assistido
+            ? "✓ Assistido (clique para remover)"
+            : "Marcar como Assistido"}
         </button>
       </div>
 
-        <SinopseFilme overview={serie.overview} />
+      <SinopseFilme overview={serie.overview} />
 
-        <TemporadasSerie serieId={serie.id} temporadas={serie.seasons} />
+      <TemporadasSerie serieId={serie.id} temporadas={serie.seasons} />
 
-        <ComentariosFilme filmeId={serie.id} />
+      <ComentariosFilme filmeId={serie.id} />
     </main>
   );
 }
