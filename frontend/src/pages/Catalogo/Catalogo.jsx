@@ -18,6 +18,10 @@ function Catalogo () {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
 
+    // States da paginação do catálogo
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
     // busca a lista de gêneros sempre que o tipo (filme/série) muda,
     // já que os IDs de gênero de filme e série são diferentes no TMDB
     useEffect(() => {
@@ -42,7 +46,11 @@ function Catalogo () {
             fetchItens();
         }, 400); // espera 400ms após parar de digitar, evita chamadas excessivas à API
         return () => clearTimeout(timeoutId);
-      }, [busca, generoSelecionado, tipoConteudo]) //fechar useEffect
+      }, [busca, generoSelecionado, tipoConteudo, page]) //fechar useEffect
+
+      useEffect(() => {
+        setPage(1);
+      }, [busca,generoSelecionado, tipoConteudo]);
 
       async function fetchItens() {
         try {
@@ -53,15 +61,17 @@ function Catalogo () {
             let url;
 
             if (busca.trim() !== "") {
-                // busca por texto usa o endpoint de pesquisa.
-                url = `https://api.themoviedb.org/3/search/${tipoConteudo}?api_key=${API_KEY}&language=pt-BR&query=${encodeURIComponent(busca)}`;
-            } else if (generoSelecionado !== "todos") {
-                 // filtro por gênero usa o endpoint de descoberta
-                 url = `https://api.themoviedb.org/3/discover/${tipoConteudo}?api_key=${API_KEY}&language=pt-BR&with_genres=${generoSelecionado}`;
-            } else {
-                // sem busca nem filtro: lista os populares
-                 url = `https://api.themoviedb.org/3/${tipoConteudo}/popular?api_key=${API_KEY}&language=pt-BR`;
-             } 
+
+            url = `https://api.themoviedb.org/3/search/${tipoConteudo}?api_key=${API_KEY}&language=pt-BR&query=${encodeURIComponent(busca)}&page=${page}`;
+
+        } else if (generoSelecionado !== "todos") {
+
+            url = `https://api.themoviedb.org/3/discover/${tipoConteudo}?api_key=${API_KEY}&language=pt-BR&with_genres=${generoSelecionado}&page=${page}`;
+
+        } else {
+
+            url = `https://api.themoviedb.org/3/${tipoConteudo}/popular?api_key=${API_KEY}&language=pt-BR&page=${page}`;
+        }
 
              const response = await fetch(url);
 
@@ -70,6 +80,8 @@ function Catalogo () {
              }
 
              const data = await response.json();
+
+             setTotalPages(Math.min(data.total_pages || 1, 500));
 
              // normaliza os campos, já que filme usa title/release_date
              // e série usa name/first_air_date
@@ -88,6 +100,40 @@ function Catalogo () {
             setCarregando(false);
         }
        }
+
+      function goToPage(pageNumber) {
+        setPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function previousPage() {
+        setPage((atual) => Math.max(atual - 1, 1));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function nextPage() {
+        setPage((atual) => Math.min(atual + 1, totalPages));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function generatePageNumbers(page, totalPages) {
+        const pages = [];
+        const range = 1;
+
+        for (let i = 1; i <= totalPages; i++) {
+            const isFirst = i === 1;
+            const isLast = i === totalPages;
+            const isNearCurrent = i >= page - range && i <= page + range;
+
+            if (isFirst || isLast || isNearCurrent) {
+            pages.push(i);
+            } else if (pages[pages.length - 1] !== "...") {
+            pages.push("...");
+            }
+        }
+
+        return pages;
+        }
     return (
         <>
             <div className={styles.pageRoot}>
@@ -168,6 +214,46 @@ function Catalogo () {
                                     <p className={styles.statusMsg}>
                                          Nenhum resultado encontrado.
                                     </p>
+                                )}
+
+                                {!carregando && !erro && itens.length > 0 && (
+                                <div className={styles.paginacao}>
+                                    <button
+                                    className={styles.btnPagina}
+                                    onClick={previousPage}
+                                    disabled={page === 1}
+                                    >
+                                    ← Anterior
+                                    </button>
+
+                                <div className={styles.numerosPagina}>
+                                {generatePageNumbers(page, totalPages).map((item, index) =>
+                                    item === "..." ? (
+                                    <span key={`dots-${index}`} className={styles.reticencias}>
+                                        ...
+                                    </span>
+                                    ) : (
+                                    <button
+                                        key={item}
+                                        className={`${styles.numeroPagina} ${
+                                        item === page ? styles.numeroPaginaAtivo : ""
+                                        }`}
+                                        onClick={() => goToPage(item)}
+                                    >
+                                        {item}
+                                    </button>
+                                    )
+                                )}
+                                </div>
+
+                                    <button
+                                    className={styles.btnPagina}
+                                    onClick={nextPage}
+                                    disabled={page === totalPages}
+                                    >
+                                    Próxima →
+                                    </button>
+                                </div>
                                 )}
                                 
                     <footer className={styles.tmdbAttribution}>
