@@ -1,0 +1,46 @@
+.seriesCard {
+  background-color: #222431;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.seriesImagePlaceholder {
+  width: 100%;
+  height: 140px;
+  background-color: #292a36;
+}
+
+.seriesInfo {
+  padding: 1rem;
+}
+
+.seriesInfo h4 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+}
+
+.seriesInfo p {
+  margin: 0 0 1rem 0;
+  color: #a1a1aa;
+  font-size: 0.85rem;
+}
+
+.btnMark {
+  width: 100%;
+  padding: 8px;
+  background-color: #f79c1e;
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btnDone {
+  background-color: #f79c1e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}

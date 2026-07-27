@@ -35,8 +35,9 @@ const codigosRecuperacao = {};
 
 // Regra de senha forte: mínimo 8 caracteres, pelo menos 1 número e
 // pelo menos 1 caractere especial.
+const REGEX_SENHA_FORTE = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>_\-]).{8,}$/;
 function senhaEhForte(senha) {
-  return senha && senha.length >= 6;
+  return !!senha && REGEX_SENHA_FORTE.test(senha);
 }
 
 // Rota de Cadastro
@@ -47,7 +48,7 @@ app.post("/cadastro", async (req, res) => {
     // 0. Valida a força da senha antes de qualquer outra coisa
     if (!senhaEhForte(password)) {
       return res.status(400).json({
-        erro: "A senha precisa ter no mínimo 6 caracteres.",
+        erro: "A senha precisa ter no mínimo 8 caracteres, incluindo 1 número e 1 caractere especial.",
       });
     }
 
@@ -298,7 +299,7 @@ app.post("/redefinir-senha", async (req, res) => {
 
   if (!senhaEhForte(novaSenha)) {
     return res.status(400).json({
-      erro: "A senha precisa ter no mínimo 6 caracteres.",
+      erro: "A senha precisa ter no mínimo 8 caracteres, incluindo 1 número e 1 caractere especial.",
     });
   }
 
@@ -447,6 +448,75 @@ app.post("/interacoes/assistido/remover", async (req, res) => {
     res.json({ mensagem: "Desmarcado como assistido." });
   } catch (erro) {
     console.error("Erro ao desmarcar assistido:", erro);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+// ========== ATUALIZAR PERFIL (nome e/ou senha) ==========
+
+// Atualiza o nome e/ou a senha do usuário logado.
+// Pra trocar a senha, é obrigatório informar a senha atual (senhaAtual).
+app.put("/usuarios/:id", async (req, res) => {
+  const { id } = req.params;
+  const { nome, senhaAtual, novaSenha } = req.body;
+
+  try {
+    const usuarioResult = await pool.query(
+      "SELECT * FROM usuarios WHERE id = $1",
+      [id],
+    );
+
+    if (usuarioResult.rows.length === 0) {
+      return res.status(404).json({ erro: "Usuário não encontrado." });
+    }
+
+    const usuario = usuarioResult.rows[0];
+
+    // Se o nome foi enviado, precisa ter conteúdo de verdade
+    if (nome !== undefined && !nome.trim()) {
+      return res.status(400).json({ erro: "O nome não pode ficar vazio." });
+    }
+
+    let novaSenhaHash = usuario.senha_hash;
+
+    // Só mexe na senha se o usuário realmente pediu pra trocar
+    if (novaSenha) {
+      if (!senhaAtual) {
+        return res.status(400).json({
+          erro: "Informe sua senha atual para definir uma nova senha.",
+        });
+      }
+
+      const senhaAtualValida = await bcrypt.compare(
+        senhaAtual,
+        usuario.senha_hash,
+      );
+      if (!senhaAtualValida) {
+        return res.status(401).json({ erro: "Senha atual incorreta." });
+      }
+
+      if (!senhaEhForte(novaSenha)) {
+        return res.status(400).json({
+          erro: "A nova senha precisa ter no mínimo 8 caracteres, incluindo 1 número e 1 caractere especial.",
+        });
+      }
+
+      novaSenhaHash = await bcrypt.hash(novaSenha, 10);
+    }
+
+    const novoNome = nome !== undefined ? nome.trim() : usuario.nome;
+
+    await pool.query(
+      "UPDATE usuarios SET nome = $1, senha_hash = $2 WHERE id = $3",
+      [novoNome, novaSenhaHash, id],
+    );
+
+    res.json({
+      mensagem: "Dados atualizados com sucesso!",
+      usuarioNome: novoNome,
+    });
+  } catch (erro) {
+    console.error("Erro ao atualizar usuário:", erro);
     res.status(500).json({ erro: "Erro interno no servidor." });
   }
 });

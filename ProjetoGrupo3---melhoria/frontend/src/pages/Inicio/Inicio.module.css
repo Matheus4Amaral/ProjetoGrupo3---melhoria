@@ -1,0 +1,140 @@
+* {
+   font-family: "Kay Pho Du";
+    font-weight: 600;
+
+}
+
+.layoutContainer {
+  display: flex;
+  background-color: #121319;
+  min-height: 100vh;
+  color: #fff;
+}
+
+.inicioContent {
+  margin-left: 250px;
+  padding: 2rem 4rem;
+  flex: 1;
+  max-width: 1200px;
+}
+
+.inicioHeader {
+  margin-bottom: 3rem;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background-color: #191a23;
+  border-radius: 8px;
+  padding: 10px 15px;
+  width: 300px;
+  gap: 10px;
+  border: 1px solid #292a36;
+}
+
+.searchBar input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+}
+
+.welcomeSection h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.welcomeSection p {
+  color: #a1a1aa;
+  margin-top: 5px;
+  margin-bottom: 2rem;
+  font-size: 20px;
+}
+
+.welcomeSection .userName {
+  font-size: 30px;
+ 
+}
+
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.contentSection {
+  margin-bottom: 3rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+
+.linkCyan {
+  color: #2ab8a1;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.moviesGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.categoriesList {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.categoryPill {
+  background-color: #222431;
+  color: #a1a1aa;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.categoryPill:hover {
+  background-color: #292a36;
+  color: #fff;
+}
+
+.categoryPill.active {
+  background-color: #f79c1e;
+  color: #121319;
+  font-weight: bold;
+}
+
+
+.tmdbAttribution {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #292a36;
+}
+
+.tmdbAttribution p {
+  color: #6b6b76;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.tipoToggle {
+  margin-bottom: 25px;
+}
+
+.tipoToggle .categoryPill {
+  margin-right: 10px;
+}

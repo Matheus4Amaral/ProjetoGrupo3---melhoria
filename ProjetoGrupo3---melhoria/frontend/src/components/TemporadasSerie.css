@@ -1,0 +1,136 @@
+/* TemporadasSerie.css */
+
+.temporadas-serie {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px;
+  color: var(--color-text);
+}
+
+.temporadas-serie h2 {
+  font-size: 1.75rem;
+  margin-bottom: 20px;
+}
+
+/* --- Abas de temporadas --- */
+
+.temporadas-tabs {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+}
+
+.temporada-tab {
+  flex-shrink: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.temporada-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.temporada-tab.ativa {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-bg-dark);
+}
+
+/* --- Lista de episódios --- */
+
+.episodios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.episodio-card {
+  display: flex;
+  gap: 20px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+  transition: 0.2s;
+}
+
+.episodio-card:hover {
+  border-color: var(--color-primary);
+}
+
+.episodio-still {
+  width: 200px;
+  height: 112px; /* proporção 16:9 */
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--color-bg-dark);
+}
+
+.episodio-still-indisponivel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 0.5rem;
+  border: 1px dashed var(--color-border);
+}
+
+.episodio-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.episodio-info h3 {
+  color: var(--color-text);
+  font-size: 1rem;
+  margin: 0 0 6px 0;
+}
+
+.episodio-data {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
+.episodio-overview {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- Responsivo --- */
+
+@media (max-width: 600px) {
+  .temporadas-serie {
+    padding: 20px;
+  }
+
+  .episodio-card {
+    flex-direction: column;
+  }
+
+  .episodio-still,
+  .episodio-still-indisponivel {
+    width: 100%;
+    height: 180px;
+  }
+}

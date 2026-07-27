@@ -1,0 +1,198 @@
+:root {
+  --color-primary: #FF9F1C;
+  --color-secondary: #2EC5B6;
+  --color-bg-dark: #181820;
+  --color-bg-card: #252837;
+  --color-text: #FFFFFF;
+  --color-text-muted: #9C9CAE;
+  --font-primary: "Kay Pho Du", serif;
+  --color-border: #2E313F;
+}
+
+
+
+.pageRoot {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text);
+}
+
+.catalogoContent {
+  margin-left: 250px;
+  padding: 2rem 4rem;
+  flex: 1;
+  max-width: 1200px;
+  font-family: "Kay Pho Du";
+  font-weight: 600;
+}
+
+.catalogoHeader {
+  margin-bottom: 2rem;
+}
+
+.catalogoHeader h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.catalogoHeader p {
+  color: var(--color-text-muted);
+  margin-top: 5px;
+}
+
+.filtrosBar {
+  margin-bottom: 1.5rem;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-dark);
+  border-radius: 8px;
+  padding: 10px 15px;
+  width: 100%;
+  max-width: 500px;
+  gap: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.searchBar input {
+  background: transparent;
+  color: var(--color-text);
+  border: none;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+}
+
+.categoriesList {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.categoryPill {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-muted);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.categoryPill:hover {
+  background-color: #292a36;
+  color: var(--color-text);
+}
+
+.categoryPill.active {
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+  font-weight: bold;
+}
+
+.moviesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5rem;
+  cursor: pointer;
+}
+
+.statusMsg {
+  color: #a1a1aa;
+  text-align: center;
+  padding: 2rem;
+}
+
+.tmdbAttribution {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #292a36;
+}
+
+.tmdbAttribution p {
+  color: #6b6b76;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.tipoToggle {
+  margin-bottom: 25px;
+}
+
+.tipoToggle .categoryPill {
+margin-right: 10px;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.numerosPagina {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.numeroPagina {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.numeroPagina:hover {
+  background-color: #292a36;
+  color: var(--color-text);
+}
+
+.numeroPaginaAtivo {
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+  border-color: var(--color-primary);
+}
+
+.reticencias {
+  color: var(--color-text-muted);
+  padding: 0 4px;
+  font-weight: bold;
+}
+
+.btnPagina {
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btnPagina:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: var(--color-bg-dark);
+}
+
+.btnPagina:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
