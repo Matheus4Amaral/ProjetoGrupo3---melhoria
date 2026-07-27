@@ -13,8 +13,10 @@ export default function Assistidos() {
     setItens(obterAssistidos());
   }, []);
 
-  function removerAssistido(id) {
-    desmarcarAssistido(id);
+  async function removerAssistido(id) {
+    const removeu = await desmarcarAssistido(id);
+    if (!removeu) return;
+
     setItens((prev) => prev.filter((item) => item.id !== id));
   }
 

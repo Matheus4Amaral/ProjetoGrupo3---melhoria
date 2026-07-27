@@ -79,9 +79,10 @@ function DetalhesSeries() {
     }
   }
 
-  function handleToggleAssistido() {
+  async function handleToggleAssistido() {
     if (assistido) {
-      desmarcarAssistido(serie.id);
+      const removeu = await desmarcarAssistido(serie.id);
+      if (!removeu) return;
       setAssistido(false);
     } else {
       marcarComoAssistido({

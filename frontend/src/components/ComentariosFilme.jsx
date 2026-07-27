@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./ComentariosFilme.css";
+import { alertService } from "../utils/alertService";
 
 const API_URL = "http://localhost:3000";
 
@@ -92,8 +93,8 @@ export default function ComentariosFilme({ filmeId }) {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.erro || "Erro ao editar comentário.");
-        return;
+        alertService.show(data.erro || "Erro ao editar comentário.", "erro")
+        return
       }
 
       setComentarios((prev) =>
@@ -104,12 +105,13 @@ export default function ComentariosFilme({ filmeId }) {
       cancelarEdicao();
     } catch (err) {
       console.error("Erro ao editar comentário:", err);
-      alert("Não foi possível conectar ao servidor.");
+      alertService.show("Não foi possível conectar ao servidor.", "erro")
     }
   }
 
   async function excluirComentario(id) {
-    if (!confirm("Excluir esse comentário?")) return;
+    const confirmou = await alertService.confirm("Excluir esse comentário?")
+    if (!confirmou) return
 
     try {
       const response = await fetch(`${API_URL}/comentarios/${id}`, {
@@ -121,14 +123,14 @@ export default function ComentariosFilme({ filmeId }) {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.erro || "Erro ao excluir comentário.");
-        return;
+        alertService.show(data.erro || "Erro ao excluir comentário.", "erro")
+        return
       }
 
       setComentarios((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error("Erro ao excluir comentário:", err);
-      alert("Não foi possível conectar ao servidor.");
+      alertService.show("Não foi possível conectar ao servidor.", "erro")
     }
   }
 

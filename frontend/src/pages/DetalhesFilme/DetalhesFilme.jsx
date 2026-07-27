@@ -71,9 +71,10 @@ function DetalhesFilme() {
     }
   }
 
-function handleToggleAssistido() {
+async function handleToggleAssistido() {
     if (assistido) {
-      desmarcarAssistido(filme.id);
+      const removeu = await desmarcarAssistido(filme.id);
+      if (!removeu) return;
       setAssistido(false);
     } else {
       marcarComoAssistido({
