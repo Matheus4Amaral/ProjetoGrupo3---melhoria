@@ -22,6 +22,14 @@ const pool = new Pool({
 app.post("/cadastro", async (req, res) => {
   const { name, email, password } = req.body;
 
+  if (!email.includes("@")) {
+    return res.status(400).json({ erro: "E-mail inválido." });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ erro: "Senha precisa ter pelo menos 8 caracteres." });
+  }
+
+
   try {
     // 1. Verifica se o e-mail já existe no banco
     const usuarioExistente = await pool.query(
@@ -210,8 +218,8 @@ app.post("/verificar-email", async (req, res) => {
 app.post("/redefinir-senha", async (req, res) => {
   const { email, novaSenha } = req.body;
 
-  if (!novaSenha || novaSenha.length < 6) {
-    return res.status(400).json({ erro: "A senha precisa ter pelo menos 6 caracteres." });
+  if (!novaSenha || novaSenha.length < 8) {
+    return res.status(400).json({ erro: "A senha precisa ter pelo menos 8 caracteres." });
   }
 
   try {
