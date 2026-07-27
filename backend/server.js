@@ -66,10 +66,10 @@ app.post("/login", async (req, res) => {
     const result = await pool.query("SELECT * FROM usuarios WHERE email = $1", [
       email,
     ]);
-  const usuario = result.rows[0];
+
     // Se não encontrou ninguém com esse e-mail
-    if (!usuario) {
-      return res.status(401).json({ erro: "E-mail ou senha incorretos." });
+    if (result.rows.length === 0) {
+      return res.status(401).json({ erro: "Usuário não encontrado." });
     }
 
     const usuario = result.rows[0];
@@ -78,7 +78,7 @@ app.post("/login", async (req, res) => {
     const senhaValida = await bcrypt.compare(password, usuario.senha_hash);
 
     if (!senhaValida) {
-   return res.status(401).json({ erro: "E-mail ou senha incorretos." });
+      return res.status(401).json({ erro: "Senha incorreta." });
     }
 
     // 3. Deu tudo certo! Retorna o ID do usuário para o React guardar
