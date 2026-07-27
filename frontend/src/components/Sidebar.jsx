@@ -5,6 +5,7 @@ import iconeCatalogo from "../assets/icons/icone_catalogo.svg";
 import iconeMinhaLista from "../assets/icons/icone_minha_lista.svg";
 import iconeAssistidos from "../assets/icons/icone_assistidos.svg";
 import Icon from "../assets/flashview_simbolo.svg";
+import { alertService } from "../utils/alertService";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -19,7 +20,10 @@ export default function Sidebar() {
     .join("")
     .toUpperCase();
 
-  function handleSair() {
+  async function handleSair() {
+    const confirmou = await alertService.confirm("Deseja realmente sair?");
+    if (!confirmou) return;
+
     localStorage.removeItem("usuarioId");
     localStorage.removeItem("usuarioNome");
     navigate("/");

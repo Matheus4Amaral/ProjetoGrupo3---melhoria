@@ -4,6 +4,7 @@ import Sidebar from "../../components/Sidebar.jsx";
 import MovieCard from "../../components/MovieCard.jsx";
 import iconeLupa from "../../assets/icons/lupa.svg";
 import { obterLista, removerDaLista } from "../../utils/minhaLista";
+import { alertService } from "../../utils/alertService";
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -38,7 +39,12 @@ export default function MinhaLista() {
   }, []);
 
   // Remove filme da lista
-  function removerFilme(id) {
+  async function removerFilme(id) {
+    const confirmou = await alertService.confirm(
+      "Remover esse filme da sua lista?",
+    )
+    if (!confirmou) return
+
     removerDaLista(id);
     setFilmes((prev) => prev.filter((filme) => filme.id !== id));
   }

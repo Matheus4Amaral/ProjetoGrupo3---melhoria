@@ -1,3 +1,5 @@
+import { alertService } from "./alertService";
+
 function getChaveStorage() {
   const usuarioId = localStorage.getItem("usuarioId");
   return usuarioId ? `minhaLista_${usuarioId}` : "minhaLista_convidado";
@@ -16,13 +18,13 @@ export function adicionarNaLista(filmeData) {
   const lista = obterLista();
   const filmeExiste = lista.some((filme) => filme.id === filmeData.id);
   if (filmeExiste) {
-    alert("Esse filme já está na sua lista!");
+    alertService.show("Esse filme já está na sua lista!", "erro")
     return false;
   }
   lista.push(filmeData);
   localStorage.setItem(getChaveStorage(), JSON.stringify(lista));
-  alert("Filme adicionado!");
-  return true;
+  alertService.show("Filme adicionado!", "sucesso")
+  return true
 }
 
 export function removerDaLista(id) {

@@ -69,7 +69,7 @@ app.post("/login", async (req, res) => {
 
     // Se não encontrou ninguém com esse e-mail
     if (result.rows.length === 0) {
-      return res.status(401).json({ erro: "Usuário não encontrado." });
+      return res.status(401).json({ erro: "E-mail ou senha incorreta." });
     }
 
     const usuario = result.rows[0];
@@ -78,7 +78,7 @@ app.post("/login", async (req, res) => {
     const senhaValida = await bcrypt.compare(password, usuario.senha_hash);
 
     if (!senhaValida) {
-      return res.status(401).json({ erro: "Senha incorreta." });
+      return res.status(401).json({ erro: "E-mail ou senha incorreta." });
     }
 
     // 3. Deu tudo certo! Retorna o ID do usuário para o React guardar

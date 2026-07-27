@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Importando useNavigate
 import styles from "./Cadastro.module.css";
 import NavBar from "../../components/Navbar/Navbar";
+import { alertService } from "../../utils/alertService";
 
 const Cadastro = () => {
   const navigate = useNavigate(); // Inicializa o hook de navegação
@@ -22,7 +23,7 @@ const Cadastro = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem!");
+      alertService.show("As senhas não coincidem!", "erro")
       return;
     }
 
@@ -44,17 +45,18 @@ const Cadastro = () => {
 
       // Se o status HTTP não for OK (ex: 400 ou 500)
       if (!response.ok) {
-        alert(data.erro || "Falha ao cadastrar.");
+        alertService.show(data.erro || "Falha ao cadastrar.", "erro")
         return;
       }
 
       // Sucesso!
-      alert("Cadastro realizado com sucesso!");
+      alertService.show("Cadastro realizado com sucesso!", "sucesso")
       navigate("/"); // Redireciona o usuário para a tela de Login
     } catch (error) {
       console.error("Erro ao conectar com o servidor:", error);
-      alert(
+      alertService.show(
         "Não foi possível conectar ao servidor. Verifique se o backend está rodando.",
+        "erro",
       );
     }
   }
