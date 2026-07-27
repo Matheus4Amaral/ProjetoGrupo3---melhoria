@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar.jsx";
+import {
+  loginSchema,
+  obterErrosPorCampo,
+} from "../../schemas/validationSchemas";
 
 function Login() {
   const navigate = useNavigate();
@@ -10,14 +14,18 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setFieldErrors({});
 
-    if (!email || !password) {
-      setError("Por favor, preencha o e-mail e a senha.");
+    const validacao = loginSchema.safeParse({ email, password });
+
+    if (!validacao.success) {
+      setFieldErrors(obterErrosPorCampo(validacao.error));
       return;
     }
 
@@ -29,12 +37,13 @@ function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(validacao.data),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        setFieldErrors(data.campos || {});
         setError(data.erro || "Falha ao fazer login.");
         setIsLoading(false);
         return;
@@ -78,9 +87,19 @@ function Login() {
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setFieldErrors((erros) => ({ ...erros, email: undefined }));
+                }}
                 autoComplete="email"
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? "login-email-error" : undefined}
               />
+              {fieldErrors.email && (
+                <span id="login-email-error" className="fieldError">
+                  {fieldErrors.email}
+                </span>
+              )}
             </div>
 
             <div className="inputBox">
@@ -89,9 +108,24 @@ function Login() {
                 type="password"
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setFieldErrors((erros) => ({
+                    ...erros,
+                    password: undefined,
+                  }));
+                }}
                 autoComplete="current-password"
+                aria-invalid={Boolean(fieldErrors.password)}
+                aria-describedby={
+                  fieldErrors.password ? "login-password-error" : undefined
+                }
               />
+              {fieldErrors.password && (
+                <span id="login-password-error" className="fieldError">
+                  {fieldErrors.password}
+                </span>
+              )}
               <div className="forgotContainer">
                 <Link to="/EsqueceuSenha" className="forgotLink">
                   Esqueceu a senha?

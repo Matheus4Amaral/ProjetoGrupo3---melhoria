@@ -61,6 +61,20 @@
     border-color: var(--color-secondary);
 }
 
+.registerForm input[aria-invalid="true"] {
+    border-color: #ff6262;
+}
+
+.fieldError {
+    display: block;
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.35;
+    margin-top: -0.75rem;
+    margin-bottom: 1rem;
+}
+
 .btnSubmit {
     width: 100%;
     height: 46px;

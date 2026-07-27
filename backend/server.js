@@ -1,3 +1,15 @@
+const {
+  cadastroSchema,
+  comentarioCriarSchema,
+  comentarioEditarSchema,
+  comentarioExcluirSchema,
+  emailBodySchema,
+  filmeIdParamsSchema,
+  loginSchema,
+  redefinirSenhaSchema,
+  validarDados,
+} = require("./validationSchemas");
+
 const express = require("express"); // Importa a biblioteca do Express para criar o servidor
 const cors = require("cors"); // Importa a biblioteca para lidar com requisições HTTP
 const { Pool } = require("pg"); // Importa a biblioteca do PostgreSQL
@@ -20,7 +32,10 @@ const pool = new Pool({
 
 // Rota de Cadastro
 app.post("/cadastro", async (req, res) => {
-  const { name, email, password } = req.body;
+  const dados = validarDados(cadastroSchema, req.body, res);
+  if (!dados) return;
+
+  const { name, email, password } = dados;
 
   try {
     // 1. Verifica se o e-mail já existe no banco
@@ -51,7 +66,10 @@ app.post("/cadastro", async (req, res) => {
 
 // Rota de Login
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const dados = validarDados(loginSchema, req.body, res);
+  if (!dados) return;
+
+  const { email, password } = dados;
 
   try {
     // 1. Busca o usuário no banco pelo e-mail
@@ -87,7 +105,10 @@ app.post("/login", async (req, res) => {
 
 // Lista todos os comentários de um filme (com o nome e usuario_id de quem comentou)
 app.get("/comentarios/:filmeId", async (req, res) => {
-  const { filmeId } = req.params;
+  const dados = validarDados(filmeIdParamsSchema, req.params, res);
+  if (!dados) return;
+
+  const { filmeId } = dados;
   try {
     const result = await pool.query(
       `SELECT avaliacoes.id, avaliacoes.usuario_id, avaliacoes.comentario,
@@ -107,7 +128,10 @@ app.get("/comentarios/:filmeId", async (req, res) => {
 
 // Cria um novo comentário
 app.post("/comentarios", async (req, res) => {
-  const { usuarioId, filmeId, comentario } = req.body;
+  const dados = validarDados(comentarioCriarSchema, req.body, res);
+  if (!dados) return;
+
+  const { usuarioId, filmeId, comentario } = dados;
 
   if (!usuarioId || !filmeId || !comentario || !comentario.trim()) {
     return res.status(400).json({ erro: "Comentário não pode ser vazio." });
@@ -135,8 +159,14 @@ app.post("/comentarios", async (req, res) => {
 
 // Edita um comentário (só o dono pode)
 app.put("/comentarios/:id", async (req, res) => {
-  const { id } = req.params;
-  const { usuarioId, comentario } = req.body;
+  const dados = validarDados(
+    comentarioEditarSchema,
+    { ...req.body, id: req.params.id },
+    res,
+  );
+  if (!dados) return;
+
+  const { id, usuarioId, comentario } = dados;
 
   if (!comentario || !comentario.trim()) {
     return res.status(400).json({ erro: "Comentário não pode ser vazio." });
@@ -166,8 +196,14 @@ app.put("/comentarios/:id", async (req, res) => {
 
 // Exclui um comentário (só o dono pode)
 app.delete("/comentarios/:id", async (req, res) => {
-  const { id } = req.params;
-  const { usuarioId } = req.body;
+  const dados = validarDados(
+    comentarioExcluirSchema,
+    { ...req.body, id: req.params.id },
+    res,
+  );
+  if (!dados) return;
+
+  const { id, usuarioId } = dados;
 
   try {
     const result = await pool.query(
@@ -190,7 +226,10 @@ app.delete("/comentarios/:id", async (req, res) => {
 
 // Verifica se o e-mail existe (etapa 1 do "Esqueceu Senha")
 app.post("/verificar-email", async (req, res) => {
-  const { email } = req.body;
+  const dados = validarDados(emailBodySchema, req.body, res);
+  if (!dados) return;
+
+  const { email } = dados;
 
   try {
     const result = await pool.query("SELECT id FROM usuarios WHERE email = $1", [email]);
@@ -208,7 +247,10 @@ app.post("/verificar-email", async (req, res) => {
 
 // Redefine a senha (etapa 2 do "Esqueceu Senha")
 app.post("/redefinir-senha", async (req, res) => {
-  const { email, novaSenha } = req.body;
+  const dados = validarDados(redefinirSenhaSchema, req.body, res);
+  if (!dados) return;
+
+  const { email, novaSenha } = dados;
 
   if (!novaSenha || novaSenha.length < 6) {
     return res.status(400).json({ erro: "A senha precisa ter pelo menos 6 caracteres." });

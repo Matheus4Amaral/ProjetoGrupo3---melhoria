@@ -117,3 +117,12 @@ node server.js
 
 ## Avisos de API
 *Este produto usa a API do TMDB, mas não é endossado ou certificado pelo TMDB.*
+
+---
+
+## Melhorias Propostas
+
+* Substituição dos alertas nativos por modais reutilizáveis, responsivos e alinhados ao design do sistema.
+* Inclusão de um modal de confirmação para a exclusão de comentários.
+* Adição do Zod no front-end e no back-end para validar formulários, comentários, parâmetros e requisições.
+* Exibição de mensagens de validação por campo e normalização dos dados antes do envio.

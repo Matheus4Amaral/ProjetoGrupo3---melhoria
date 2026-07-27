@@ -16,13 +16,17 @@ export function adicionarNaLista(filmeData) {
   const lista = obterLista();
   const filmeExiste = lista.some((filme) => filme.id === filmeData.id);
   if (filmeExiste) {
-    alert("Esse filme já está na sua lista!");
-    return false;
+    return {
+      sucesso: false,
+      mensagem: "Esse título já está na sua lista.",
+    };
   }
   lista.push(filmeData);
   localStorage.setItem(getChaveStorage(), JSON.stringify(lista));
-  alert("Filme adicionado!");
-  return true;
+  return {
+    sucesso: true,
+    mensagem: "Título adicionado à sua lista!",
+  };
 }
 
 export function removerDaLista(id) {

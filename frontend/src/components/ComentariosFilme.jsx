@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import "./ComentariosFilme.css";
+import FeedbackModal from "./FeedbackModal";
+import { comentarioSchema } from "../schemas/validationSchemas";
 
 const API_URL = "http://localhost:3000";
 
@@ -11,14 +13,13 @@ export default function ComentariosFilme({ filmeId }) {
 
   const [editandoId, setEditandoId] = useState(null);
   const [textoEdicao, setTextoEdicao] = useState("");
+  const [feedback, setFeedback] = useState(null);
+  const [comentarioParaExcluir, setComentarioParaExcluir] = useState(null);
 
   const usuarioId = localStorage.getItem("usuarioId");
 
   useEffect(() => {
-    carregarComentarios();
-  }, [filmeId]);
-
-  async function carregarComentarios() {
+    async function carregarComentarios() {
     try {
       const response = await fetch(`${API_URL}/comentarios/${filmeId}`, {
         cache: "no-store", // <- adiciona essa opção
@@ -28,7 +29,10 @@ export default function ComentariosFilme({ filmeId }) {
     } catch (err) {
       console.error("Erro ao carregar comentários:", err);
     }
-  }
+    }
+
+    carregarComentarios();
+  }, [filmeId]);
 
   async function handleEnviar(e) {
     e.preventDefault();
@@ -38,14 +42,23 @@ export default function ComentariosFilme({ filmeId }) {
       setErro("Você precisa estar logado para comentar.");
       return;
     }
-    if (!texto.trim()) return;
+    const validacao = comentarioSchema.safeParse(texto);
+
+    if (!validacao.success) {
+      setErro(validacao.error.issues[0]?.message || "Comentário inválido.");
+      return;
+    }
 
     setEnviando(true);
     try {
       const response = await fetch(`${API_URL}/comentarios`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuarioId, filmeId, comentario: texto }),
+        body: JSON.stringify({
+          usuarioId,
+          filmeId,
+          comentario: validacao.data,
+        }),
       });
 
       const data = await response.json();
@@ -80,19 +93,35 @@ export default function ComentariosFilme({ filmeId }) {
   }
 
   async function salvarEdicao(id) {
-    if (!textoEdicao.trim()) return;
+    const validacao = comentarioSchema.safeParse(textoEdicao);
+
+    if (!validacao.success) {
+      setFeedback({
+        tipo: "error",
+        titulo: "Comentário inválido",
+        mensagem: validacao.error.issues[0]?.message,
+      });
+      return;
+    }
 
     try {
       const response = await fetch(`${API_URL}/comentarios/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuarioId, comentario: textoEdicao }),
+        body: JSON.stringify({
+          usuarioId,
+          comentario: validacao.data,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.erro || "Erro ao editar comentário.");
+        setFeedback({
+          tipo: "error",
+          titulo: "Não foi possível editar",
+          mensagem: data.erro || "O comentário não pôde ser atualizado.",
+        });
         return;
       }
 
@@ -104,12 +133,27 @@ export default function ComentariosFilme({ filmeId }) {
       cancelarEdicao();
     } catch (err) {
       console.error("Erro ao editar comentário:", err);
-      alert("Não foi possível conectar ao servidor.");
+      setFeedback({
+        tipo: "error",
+        titulo: "Servidor indisponível",
+        mensagem: "Não foi possível conectar ao servidor.",
+      });
     }
   }
 
-  async function excluirComentario(id) {
-    if (!confirm("Excluir esse comentário?")) return;
+  function solicitarExclusao(id) {
+    setComentarioParaExcluir(id);
+    setFeedback({
+      tipo: "confirm",
+      titulo: "Excluir comentário?",
+      mensagem: "Essa ação é permanente e não poderá ser desfeita.",
+    });
+  }
+
+  async function confirmarExclusao() {
+    const id = comentarioParaExcluir;
+    setFeedback(null);
+    setComentarioParaExcluir(null);
 
     try {
       const response = await fetch(`${API_URL}/comentarios/${id}`, {
@@ -121,15 +165,28 @@ export default function ComentariosFilme({ filmeId }) {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.erro || "Erro ao excluir comentário.");
+        setFeedback({
+          tipo: "error",
+          titulo: "Não foi possível excluir",
+          mensagem: data.erro || "O comentário não pôde ser excluído.",
+        });
         return;
       }
 
       setComentarios((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error("Erro ao excluir comentário:", err);
-      alert("Não foi possível conectar ao servidor.");
+      setFeedback({
+        tipo: "error",
+        titulo: "Servidor indisponível",
+        mensagem: "Não foi possível conectar ao servidor.",
+      });
     }
+  }
+
+  function fecharFeedback() {
+    setFeedback(null);
+    setComentarioParaExcluir(null);
   }
 
   return (
@@ -145,6 +202,7 @@ export default function ComentariosFilme({ filmeId }) {
           onChange={(e) => setTexto(e.target.value)}
           disabled={!usuarioId || enviando}
           rows={3}
+          maxLength={1000}
         />
         <button
           type="submit"
@@ -180,7 +238,7 @@ export default function ComentariosFilme({ filmeId }) {
                   {ehDono && !estaEditando && (
                     <div className="comentario-acoes">
                       <button onClick={() => iniciarEdicao(c)}>Editar</button>
-                      <button onClick={() => excluirComentario(c.id)}>
+                      <button onClick={() => solicitarExclusao(c.id)}>
                         Excluir
                       </button>
                     </div>
@@ -193,6 +251,7 @@ export default function ComentariosFilme({ filmeId }) {
                       value={textoEdicao}
                       onChange={(e) => setTextoEdicao(e.target.value)}
                       rows={3}
+                      maxLength={1000}
                     />
                     <div className="comentario-edicao-acoes">
                       <button onClick={() => salvarEdicao(c.id)}>Salvar</button>
@@ -207,6 +266,20 @@ export default function ComentariosFilme({ filmeId }) {
           })
         )}
       </div>
+
+      <FeedbackModal
+        aberto={Boolean(feedback)}
+        tipo={feedback?.tipo}
+        titulo={feedback?.titulo}
+        mensagem={feedback?.mensagem}
+        textoConfirmar={
+          feedback?.tipo === "confirm" ? "Excluir" : "Entendi"
+        }
+        onFechar={fecharFeedback}
+        onConfirmar={
+          feedback?.tipo === "confirm" ? confirmarExclusao : fecharFeedback
+        }
+      />
     </section>
   );
 }

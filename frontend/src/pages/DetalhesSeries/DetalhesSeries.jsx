@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 import "../DetalhesFilme/DetalhesFilme.css";
 
@@ -7,6 +7,7 @@ import BannerFilme from "../../components/BannerFilme";
 import PosterFilme from "../../components/PosterFilme";
 import InformacoesFilme from "../../components/InformacoesFilme";
 import SinopseFilme from "../../components/SinopseFilme";
+import FeedbackModal from "../../components/FeedbackModal";
 import { adicionarNaLista, estaNaLista, removerDaLista } from "../../utils/minhaLista";
 import { marcarComoAssistido, desmarcarAssistido, estaAssistido } from "../../utils/assistidos";
 import ComentariosFilme from "../../components/ComentariosFilme";
@@ -17,13 +18,12 @@ const IMG_BASE = "https://image.tmdb.org/t/p/w300";
 
 function DetalhesSeries() {
   const { id } = useParams();
-  const navigate = useNavigate();
-
   const [serie, setSerie] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
   const [naLista, setNaLista] = useState(false);
   const [assistido, setAssistido] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     async function carregarSerie() {
@@ -65,7 +65,7 @@ function DetalhesSeries() {
       removerDaLista(serie.id);
       setNaLista(false);
     } else {
-      adicionarNaLista({
+      const resultado = adicionarNaLista({
         id: serie.id,
         title: serie.title,
         poster_path: serie.poster_path
@@ -76,6 +76,11 @@ function DetalhesSeries() {
         tipo: "tv",
       });
       setNaLista(true);
+      setFeedback({
+        tipo: resultado.sucesso ? "success" : "info",
+        titulo: resultado.sucesso ? "Adicionado à lista" : "Já está na lista",
+        mensagem: resultado.mensagem,
+      });
     }
   }
 
@@ -142,6 +147,14 @@ function DetalhesSeries() {
         <TemporadasSerie serieId={serie.id} temporadas={serie.seasons} />
 
         <ComentariosFilme filmeId={serie.id} />
+
+        <FeedbackModal
+          aberto={Boolean(feedback)}
+          tipo={feedback?.tipo}
+          titulo={feedback?.titulo}
+          mensagem={feedback?.mensagem}
+          onFechar={() => setFeedback(null)}
+        />
     </main>
   );
 }

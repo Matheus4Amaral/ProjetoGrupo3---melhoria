@@ -183,3 +183,15 @@
 .actions-row.center {
   justify-content: center;
 }
+.input-field[aria-invalid="true"] {
+  border-color: #ff6262;
+}
+
+.field-error {
+  display: block;
+  margin-top: 0.4rem;
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+}

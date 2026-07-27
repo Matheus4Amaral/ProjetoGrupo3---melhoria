@@ -95,6 +95,19 @@
   border-color: #ff9f1c;
 }
 
+.inputBox input[aria-invalid="true"] {
+  border-color: #ff6262;
+}
+
+.fieldError {
+  display: block;
+  margin-top: 0.45rem;
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 /* Esqueceu a Senha */
 .forgotContainer {
   display: flex;
