@@ -3,6 +3,10 @@ import { Link, useNavigate } from "react-router-dom"; // Importando useNavigate
 import styles from "./Cadastro.module.css";
 import NavBar from "../../components/Navbar/Navbar";
 
+// Regra de senha forte: mínimo 8 caracteres, pelo menos 1 número e
+// pelo menos 1 caractere especial.
+const REGEX_SENHA_FORTE = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>_\-]).{8,}$/;
+
 const Cadastro = () => {
   const navigate = useNavigate(); // Inicializa o hook de navegação
 
@@ -14,8 +18,12 @@ const Cadastro = () => {
   });
 
   // Critérios de senha avaliados em tempo real, para mostrar o checklist
-  const tamanhoValido = formData.password.length >= 6;
-  const senhasCoincidem = formData.password === formData.confirmPassword;
+  const criteriosSenha = {
+    tamanho: formData.password.length >= 8,
+    numero: /[0-9]/.test(formData.password),
+    especial: /[!@#$%^&*(),.?":{}|<>_\-]/.test(formData.password),
+  };
+  const senhaValida = REGEX_SENHA_FORTE.test(formData.password);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -25,8 +33,10 @@ const Cadastro = () => {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!tamanhoValido) {
-      alert("A senha precisa ter no mínimo 6 caracteres.");
+    if (!senhaValida) {
+      alert(
+        "A senha precisa ter no mínimo 8 caracteres, incluindo 1 número e 1 caractere especial.",
+      );
       return;
     }
 
@@ -104,8 +114,14 @@ const Cadastro = () => {
 
           {formData.password && (
             <ul className={styles.passwordChecklist}>
-              <li className={tamanhoValido ? styles.valido : styles.invalido}>
-                {tamanhoValido ? "✓" : "✗"} Mínimo de 6 caracteres
+              <li className={criteriosSenha.tamanho ? styles.valido : styles.invalido}>
+                {criteriosSenha.tamanho ? "✓" : "✗"} Mínimo de 8 caracteres
+              </li>
+              <li className={criteriosSenha.numero ? styles.valido : styles.invalido}>
+                {criteriosSenha.numero ? "✓" : "✗"} Pelo menos 1 número
+              </li>
+              <li className={criteriosSenha.especial ? styles.valido : styles.invalido}>
+                {criteriosSenha.especial ? "✓" : "✗"} Pelo menos 1 caractere especial
               </li>
             </ul>
           )}
@@ -122,7 +138,9 @@ const Cadastro = () => {
           <button
             type="submit"
             className={styles.btnSubmit}
-            disabled={!tamanhoValido || !senhasCoincidem}
+            disabled={
+              !senhaValida || formData.password !== formData.confirmPassword
+            }
           >
             Cadastrar
           </button>

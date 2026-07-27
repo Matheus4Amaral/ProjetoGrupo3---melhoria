@@ -1,200 +1,205 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar/Navbar.jsx";
+import { useToast } from "../../components/ToastContext";
+import NavBar from "../../components/Navbar/Navbar";
 import "./EsqueceuSenha.css";
 
-const API_URL = "http://localhost:3000";
-
 export default function EsqueceuSenha() {
-  const [contato, setContato] = useState("");
+  const [etapa, setEtapa] = useState(1); // 1: Email, 2: Código, 3: Nova Senha
+  const [email, setEmail] = useState("");
+  const [codigo, setCodigo] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
-  const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [etapa, setEtapa] = useState(1); // 1 = Digitar e-mail, 2 = Digitar nova senha
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
+  const [confirmaSenha, setConfirmaSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
+
+  const mostrarToast = useToast();
   const navigate = useNavigate();
 
-  async function handleProcurar(e) {
-    e.preventDefault();
-    setErro("");
-    setCarregando(true);
+  // Validações para a etapa 3
+  const senhasCoincidem = novaSenha === confirmaSenha;
+  const senhaValida = novaSenha.length >= 6;
 
+  async function handleEnviarEmail(e) {
+    e.preventDefault();
+    setCarregando(true);
     try {
-      const response = await fetch(`${API_URL}/verificar-email`, {
+      const res = await fetch("http://localhost:3000/verificar-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: contato }),
+        body: JSON.stringify({ email }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setErro(data.erro || "E-mail não encontrado.");
-        return;
-      }
-
+      mostrarToast(data.mensagem, "sucesso");
       setEtapa(2);
     } catch (err) {
-      console.error("Erro ao verificar e-mail:", err);
-      setErro("Não foi possível conectar ao servidor.");
+      mostrarToast(err.message || "Erro ao enviar e-mail.", "erro");
     } finally {
       setCarregando(false);
     }
   }
 
-  async function handleRedefinir(e) {
+  async function handleVerificarCodigo(e) {
     e.preventDefault();
-    setErro("");
-
-    if (novaSenha !== confirmarSenha) {
-      setErro("As senhas não coincidem.");
-      return;
-    }
-
-    if (novaSenha.length < 6) {
-      setErro("A senha precisa ter pelo menos 6 caracteres.");
-      return;
-    }
-
     setCarregando(true);
-
     try {
-      const response = await fetch(`${API_URL}/redefinir-senha`, {
+      const res = await fetch("http://localhost:3000/verificar-codigo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: contato, novaSenha }),
+        body: JSON.stringify({ email, codigo }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setErro(data.erro || "Erro ao redefinir senha.");
-        return;
-      }
-
-      setSucesso(
-        "Senha redefinida com sucesso! Redirecionando para o login...",
-      );
-      setTimeout(() => navigate("/"), 2000);
+      mostrarToast(data.mensagem, "sucesso");
+      setEtapa(3);
     } catch (err) {
-      console.error("Erro ao redefinir senha:", err);
-      setErro("Não foi possível conectar ao servidor.");
+      mostrarToast(err.message || "Erro ao validar código.", "erro");
     } finally {
       setCarregando(false);
     }
   }
 
-  function handleVoltar() {
-    navigate("/");
+  async function handleRedefinirSenha(e) {
+    e.preventDefault();
+    if (!senhaValida || !senhasCoincidem) return;
+
+    setCarregando(true);
+    try {
+      const res = await fetch("http://localhost:3000/redefinir-senha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, novaSenha }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro);
+
+      mostrarToast(data.mensagem, "sucesso");
+      navigate("/"); // Volta para o login
+    } catch (err) {
+      mostrarToast(err.message || "Erro ao redefinir senha.", "erro");
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  function renderizarEtapa() {
+    switch (etapa) {
+      case 1:
+        return (
+          <form onSubmit={handleEnviarEmail} className="form-container">
+            <h2 className="card-title">Recuperar Senha</h2>
+            <div className="input-group">
+              <label htmlFor="email">E-mail</label>
+              <input
+                id="email"
+                type="email"
+                className="input-field"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Digite seu e-mail de cadastro"
+                required
+              />
+            </div>
+            <div className="actions-row center">
+              <button
+                type="submit"
+                className="btn-solid btn-medium"
+                disabled={carregando}
+              >
+                {carregando ? "Enviando..." : "Enviar Código"}
+              </button>
+            </div>
+          </form>
+        );
+      case 2:
+        return (
+          <form onSubmit={handleVerificarCodigo} className="form-container">
+            <h2 className="card-title">Verifique seu E-mail</h2>
+            <p className="instruction-text">
+              Enviamos um código de 6 dígitos para <strong>{email}</strong>.
+              Insira-o abaixo para continuar.
+            </p>
+            <div className="input-group">
+              <label htmlFor="codigo">Código de Verificação</label>
+              <input
+                id="codigo"
+                type="text"
+                className="input-field"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+                maxLength={6}
+                required
+              />
+            </div>
+            <div className="actions-row center">
+              <button
+                type="submit"
+                className="btn-solid btn-medium"
+                disabled={carregando}
+              >
+                {carregando ? "Verificando..." : "Verificar"}
+              </button>
+            </div>
+          </form>
+        );
+      case 3:
+        return (
+          <form onSubmit={handleRedefinirSenha} className="form-container">
+            <h2 className="card-title">Crie uma Nova Senha</h2>
+            <div className="input-group">
+              <label htmlFor="novaSenha">Nova Senha</label>
+              <input
+                id="novaSenha"
+                type="password"
+                className="input-field"
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="confirmaSenha">Confirmar Nova Senha</label>
+              <input
+                id="confirmaSenha"
+                type="password"
+                className="input-field"
+                value={confirmaSenha}
+                onChange={(e) => setConfirmaSenha(e.target.value)}
+                required
+              />
+            </div>
+            <div className="actions-row center">
+              <button
+                type="submit"
+                className="btn-solid btn-medium"
+                disabled={carregando || !senhasCoincidem || !senhaValida}
+              >
+                {carregando ? "Salvando..." : "Redefinir Senha"}
+              </button>
+            </div>
+          </form>
+        );
+      default:
+        return null;
+    }
   }
 
   return (
-    <>
-      <Navbar />
-
-      <div className="esqueceu-senha-page">
-        <main className="main-content">
-          <div className="card">
-            <h2 className="card-title">Esqueceu a Senha</h2>
-
-            {erro && (
-              <p className="instruction-text" style={{ color: "#ff6b6b" }}>
-                {erro}
-              </p>
-            )}
-            {sucesso && (
-              <p className="instruction-text" style={{ color: "#4caf50" }}>
-                {sucesso}
-              </p>
-            )}
-
-            {etapa === 1 ? (
-              /* =========================================
-               ETAPA 1: SOLICITAR E-MAIL
-               ========================================= */
-              <form onSubmit={handleProcurar} className="form-container">
-                <div className="input-group">
-                  <label htmlFor="contato">E-mail</label>
-                  <input
-                    type="email"
-                    id="contato"
-                    value={contato}
-                    onChange={(e) => setContato(e.target.value)}
-                    className="input-field"
-                    required
-                  />
-                </div>
-
-                <div className="actions-row space-between">
-                  <button
-                    type="button"
-                    className="btn-solid btn-small"
-                    onClick={handleVoltar}
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn-solid btn-small"
-                    disabled={carregando}
-                  >
-                    {carregando ? "Procurando..." : "Procurar"}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              /* =========================================
-               ETAPA 2: DEFINIR NOVA SENHA
-               ========================================= */
-              <form onSubmit={handleRedefinir} className="form-container">
-                <p className="instruction-text">Digite sua nova senha</p>
-
-                <div className="input-group">
-                  <label htmlFor="novaSenha">Nova senha</label>
-                  <input
-                    type="password"
-                    id="novaSenha"
-                    value={novaSenha}
-                    onChange={(e) => setNovaSenha(e.target.value)}
-                    className="input-field"
-                    required
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label htmlFor="confirmarSenha">Confirmar senha</label>
-                  <input
-                    type="password"
-                    id="confirmarSenha"
-                    value={confirmarSenha}
-                    onChange={(e) => setConfirmarSenha(e.target.value)}
-                    className="input-field"
-                    required
-                  />
-                </div>
-
-                <div className="actions-row center">
-                  <button
-                    type="submit"
-                    className="btn-solid btn-medium"
-                    disabled={carregando}
-                  >
-                    {carregando ? "Salvando..." : "Redefinir senha"}
-                  </button>
-                </div>
-
-                <p className="footer-text">
-                  Já Possui Uma Conta?{" "}
-                  <Link to="/Login" className="link-highlight">
-                    Login
-                  </Link>
-                </p>
-              </form>
-            )}
-          </div>
-        </main>
-      </div>
-    </>
+    <div className="esqueceu-senha-page">
+      <NavBar />
+      <main className="main-content">
+        <div className="card">
+          {renderizarEtapa()}
+          <p className="footer-text">
+            Lembrou sua senha?{" "}
+            <Link to="/" className="link-highlight">
+              Voltar para o Login
+            </Link>
+          </p>
+        </div>
+      </main>
+    </div>
   );
 }

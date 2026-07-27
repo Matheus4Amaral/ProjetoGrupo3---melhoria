@@ -64,9 +64,11 @@ function DetalhesFilme() {
 
   async function handleToggleMinhaLista() {
     if (naLista) {
-      await removerDaLista(filme.id);
-      setNaLista(false);
-      mostrarToast("Filme removido da sua lista", "sucesso");
+      if (window.confirm("Tem certeza que deseja remover o filme da sua lista?")) {
+        await removerDaLista(filme.id);
+        setNaLista(false);
+        mostrarToast("Filme removido da sua lista", "sucesso");
+      }
     } else {
       await adicionarNaLista({
         id: filme.id,
@@ -85,9 +87,11 @@ function DetalhesFilme() {
 
   async function handleToggleAssistido() {
     if (assistido) {
-      await desmarcarAssistido(filme.id);
-      setAssistido(false);
-      mostrarToast("Filme removido dos assistidos", "sucesso");
+      if (window.confirm("Tem certeza que deseja remover o filme dos assistidos?")) {
+        await desmarcarAssistido(filme.id);
+        setAssistido(false);
+        mostrarToast("Filme removido dos assistidos", "sucesso");
+      }
     } else {
       await marcarComoAssistido({
         id: filme.id,

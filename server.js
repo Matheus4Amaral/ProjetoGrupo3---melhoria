@@ -36,21 +36,23 @@ const codigosRecuperacao = {};
 // Regra de senha forte: mínimo 8 caracteres, pelo menos 1 número e
 // pelo menos 1 caractere especial.
 function senhaEhForte(senha) {
-  return senha && senha.length >= 6;
+  const regexForte = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>_\-]).{8,}$/;
+  return regexForte.test(senha || "");
 }
 
 // Rota de Cadastro
 app.post("/cadastro", async (req, res) => {
   const { name, email, password } = req.body;
 
-  try {
-    // 0. Valida a força da senha antes de qualquer outra coisa
-    if (!senhaEhForte(password)) {
-      return res.status(400).json({
-        erro: "A senha precisa ter no mínimo 6 caracteres.",
-      });
-    }
+  // 0. Valida a força da senha antes de qualquer outra coisa
+  if (!senhaEhForte(password)) {
+    return res.status(400).json({
+      erro:
+        "A senha precisa ter no mínimo 8 caracteres, incluindo pelo menos 1 número e 1 caractere especial.",
+    });
+  }
 
+  try {
     // 1. Verifica se o e-mail já existe no banco
     const usuarioExistente = await pool.query(
       "SELECT * FROM usuarios WHERE email = $1",
@@ -238,14 +240,19 @@ app.post("/verificar-email", async (req, res) => {
     // Guarda o código com validade de 15 minutos
     codigosRecuperacao[email] = {
       codigo,
-      expiraEm: Date.now() + 15 * 60 * 1000, // 15 minutos
+      expiraEm: Date.now() + 15 * 60 * 1000,
     };
 
     await transporter.sendMail({
-      from: `"FlashView" <${process.env.EMAIL_USER}>`,
+      from: process.env.EMAIL_USER,
       to: email,
       subject: "Código de recuperação de senha - FlashView",
-      html: `<p>Você solicitou a redefinição da sua senha. Seu código é: <strong>${codigo}</strong></p>`,
+      html: `
+        <p>Você solicitou a redefinição da sua senha no FlashView.</p>
+        <p>Seu código de verificação é:</p>
+        <h2 style="letter-spacing: 4px;">${codigo}</h2>
+        <p>Esse código expira em 15 minutos. Se não foi você, ignore este e-mail.</p>
+      `,
     });
 
     res.json({ mensagem: "Código enviado para o seu e-mail." });
@@ -298,12 +305,20 @@ app.post("/redefinir-senha", async (req, res) => {
 
   if (!senhaEhForte(novaSenha)) {
     return res.status(400).json({
-      erro: "A senha precisa ter no mínimo 6 caracteres.",
+      erro:
+        "A senha precisa ter no mínimo 8 caracteres, incluindo pelo menos 1 número e 1 caractere especial.",
     });
   }
 
   try {
-    // A verificação de existência do usuário já foi feita na etapa 1
+    const usuarioExistente = await pool.query(
+      "SELECT id FROM usuarios WHERE email = $1",
+      [email],
+    );
+
+    if (usuarioExistente.rows.length === 0) {
+      return res.status(404).json({ erro: "Usuário não encontrado." });
+    }
 
     const saltRounds = 10;
     const novaSenhaHash = await bcrypt.hash(novaSenha, saltRounds);

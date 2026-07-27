@@ -43,16 +43,17 @@ export default function MovieCard({
     }
   }
 
-  function handleRemover(e) {
+  async function handleRemover(e) {
     e.stopPropagation();
-    onRemover?.(id, tipo); //passei o id e o tipo para a função de remoção, para que o pai saiba qual item remover da lista.
-
-    // NOVO: Notifica o pai após a remoção para recalcular os contadores automaticamente.
-    aoAtualizarLista?.();
+    if (window.confirm(`Tem certeza que deseja remover "${titulo}" da lista?`)) {
+      onRemover?.(id, tipo); //passei o id e o tipo para a função de remoção, para que o pai saiba qual item remover da lista.
+      // NOVO: Notifica o pai após a remoção para recalcular os contadores automaticamente.
+      aoAtualizarLista?.();
+    }
   }
 
   return (
-    <div className={styles.movieItem} onClick={handleClick}>
+    <div className={styles.movieItem} onClick={handleClick} role="button" tabIndex={0}>
       <div
         className={styles.moviePoster}
         style={
@@ -81,6 +82,7 @@ export default function MovieCard({
       <p>{titulo}</p>
 
       {subtitulo && <span className={styles.movieSubtitulo}>{subtitulo}</span>}
+
     </div>
   );
 }

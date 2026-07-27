@@ -72,9 +72,11 @@ function DetalhesSeries() {
 
   async function handleToggleMinhaLista() {
     if (naLista) {
-      await removerDaLista(serie.id, "tv"); // <- adiciona "tv" aqui
-      setNaLista(false);
-      mostrarToast("Série removida da sua lista", "sucesso");
+      if (window.confirm("Tem certeza que deseja remover a série da sua lista?")) {
+        await removerDaLista(serie.id, "tv");
+        setNaLista(false);
+        mostrarToast("Série removida da sua lista", "sucesso");
+      }
     } else {
       await adicionarNaLista({
         id: serie.id,
@@ -93,9 +95,11 @@ function DetalhesSeries() {
 
   async function handleToggleAssistido() {
     if (assistido) {
-      await desmarcarAssistido(serie.id, "tv");
-      setAssistido(false);
-      mostrarToast("Série removida dos assistidos", "sucesso");
+      if (window.confirm("Tem certeza que deseja remover a série dos assistidos?")) {
+        await desmarcarAssistido(serie.id, "tv");
+        setAssistido(false);
+        mostrarToast("Série removida dos assistidos", "sucesso");
+      }
     } else {
       await marcarComoAssistido({
         id: serie.id,
