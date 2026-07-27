@@ -9,6 +9,7 @@ import Catalogo from './pages/Catalogo/Catalogo.jsx';
 import DetalhesFilme from './pages/DetalhesFilme/DetalhesFilme';
 import DetalhesSeries from "./pages/DetalhesSeries/DetalhesSeries.jsx";
 import Assistidos from "./pages/Assistidos/Assistidos.jsx"; 
+import NotFound from "./pages/NotFound/NotFound.jsx";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/filme/:id" element={<DetalhesFilme />} />
         <Route path="/serie/:id" element={<DetalhesSeries />} />
         <Route path="/assistidos" element={<Assistidos />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
