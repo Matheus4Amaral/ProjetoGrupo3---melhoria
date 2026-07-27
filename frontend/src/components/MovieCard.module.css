@@ -1,5 +1,11 @@
 .movieItem {
+  transition: transform .3s ease, box-shadow .3s ease;
   cursor: pointer;
+}
+
+.movieItem:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 12px 24px rgba(0,0,0,.25);
 }
 
 .movieItem p {
@@ -8,12 +14,20 @@
   margin-top: 10px;
 }
 
+.moviePoster{
+    transition: filter .3s ease;
+}
+
 .moviePoster {
   width: 100%;
   aspect-ratio: 2 / 3;
   background-color: #222431;
   border-radius: 8px;
   position: relative;
+}
+
+.movieItem:hover .moviePoster{
+    filter: brightness(.75);
 }
 
 .movieSubtitulo {
