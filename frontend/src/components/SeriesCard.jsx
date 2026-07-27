@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./SeriesCard.module.css";
 import { adicionarNaLista } from "../utils/minhaLista";
+import { useAlert } from "../contexts/AlertContext.jsx";
 
 export default function SeriesCard({
   id,
@@ -14,6 +15,7 @@ export default function SeriesCard({
   tipo,
 }) {
 
+  const {mostrarAlerta} = useAlert()
   const navigate = useNavigate()
 
   function handleClick(){
@@ -23,7 +25,7 @@ export default function SeriesCard({
   function handleAdicionar(e){
     e.stopPropagation();
 
-    adicionarNaLista({
+    const resultado = adicionarNaLista({
       id,
       title: titulo,
       poster_path: poster,
@@ -32,7 +34,14 @@ export default function SeriesCard({
       tipo,
     })
 
-    window.dispatchEvent(new Event("stats-atualizados"));
+    mostrarAlerta({
+      titulo: resultado.sucesso ? "Sucesso" : "Aviso",
+      mensagem: resultado.mensagem,
+      textoConfirmar: "OK",
+    })
+
+    if(resultado.sucesso)
+      window.dispatchEvent(new Event("stats-atualizados"));
   }
 
 

@@ -5,8 +5,10 @@ import iconeCatalogo from "../assets/icons/icone_catalogo.svg";
 import iconeMinhaLista from "../assets/icons/icone_minha_lista.svg";
 import iconeAssistidos from "../assets/icons/icone_assistidos.svg";
 import Icon from "../assets/flashview_simbolo.svg";
+import { useAlert } from "../contexts/AlertContext.jsx";
 
 export default function Sidebar() {
+  const { mostrarAlerta } = useAlert();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -20,9 +22,19 @@ export default function Sidebar() {
     .toUpperCase();
 
   function handleSair() {
-    localStorage.removeItem("usuarioId");
-    localStorage.removeItem("usuarioNome");
-    navigate("/");
+
+    mostrarAlerta({
+      titulo: "Confirmar saída",
+      mensagem: "Tem certeza que deseja sair da sua conta?",
+      textoConfirmar: "Sair",
+      textoCancelar: "Cancelar",
+      mostrarCancelar: true,
+      onConfirmar: () => {
+        localStorage.removeItem("usuarioId");
+        localStorage.removeItem("usuarioNome");
+        navigate("/");
+      }
+    })
   }
 
   return (

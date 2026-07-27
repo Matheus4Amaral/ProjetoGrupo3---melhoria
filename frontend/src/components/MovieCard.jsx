@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./MovieCard.module.css";
+import { useAlert } from "../contexts/AlertContext.jsx";
 import { adicionarNaLista } from "../utils/minhaLista";
 
 export default function MovieCard({
@@ -14,6 +15,7 @@ export default function MovieCard({
   tipo,
 }) {
 
+  const {mostrarAlerta} = useAlert();
   const navigate = useNavigate();
 
   function handleClick() {
@@ -23,7 +25,7 @@ export default function MovieCard({
   function handleAdicionar(e) {
     e.stopPropagation();
 
-    adicionarNaLista({
+    const resultado = adicionarNaLista({
       id,
       title: titulo,
       poster_path: poster,
@@ -31,8 +33,17 @@ export default function MovieCard({
       genre_ids,
       tipo,
     });
+
+    mostrarAlerta({
+      titulo: resultado.sucesso ? "Sucesso" : "Aviso",
+      mensagem: resultado.mensagem,
+      textoConfirmar: "OK",
+    })
+
     //Dispara o evento para ser escutado no Inicio.jsx e atualizar os cards
-    window.dispatchEvent(new Event("stats-atualizados"));
+
+    if(resultado.sucesso)
+      window.dispatchEvent(new Event("stats-atualizados"));
   }
 
   function handleRemover(e) {

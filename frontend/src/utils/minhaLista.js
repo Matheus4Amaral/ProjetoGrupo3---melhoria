@@ -15,18 +15,47 @@ export function estaNaLista(id) {
 export function adicionarNaLista(filmeData) {
   const lista = obterLista();
   const filmeExiste = lista.some((filme) => filme.id === filmeData.id);
+
   if (filmeExiste) {
-    alert("Esse filme já está na sua lista!");
-    return false;
-  }
+
+    if(filmeData.tipo === "movie"){
+      return {
+        sucesso: false,
+        mensagem: "Esse filme já está na sua lista!",
+      };
+    } else {
+      return {
+        sucesso: false,
+        mensagem: "Essa série já está na sua lista!",
+      };
+    }
+    
+  } 
+
   lista.push(filmeData);
   localStorage.setItem(getChaveStorage(), JSON.stringify(lista));
-  alert("Filme adicionado!");
-  return true;
+
+  if(filmeData.tipo === "movie"){
+    return {
+      sucesso: true,
+      mensagem: "Filme adicionado!",
+    };
+  } else {
+    return {
+      sucesso: true,
+      mensagem: "Série adicionada!",
+    };
+  }
+  
 }
 
 export function removerDaLista(id) {
   const lista = obterLista();
   const novaLista = lista.filter((filme) => filme.id !== id);
   localStorage.setItem(getChaveStorage(), JSON.stringify(novaLista));
+
+  return {
+    sucesso: true,
+    mensagem: "Filme removido da lista.",
+  };
 }
