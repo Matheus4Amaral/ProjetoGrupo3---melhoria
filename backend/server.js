@@ -325,8 +325,7 @@ app.post("/redefinir-senha", async (req, res) => {
 
 // ========== MINHA LISTA / ASSISTIDOS (tabela interacoes) ==========
 
-// Retorna só os IDs+tipo salvos (rápido, sem consultar o TMDB) — usado
-// para contadores, onde só precisamos saber a QUANTIDADE
+//rota para obter a lista de filmes/séries salvos pelo usuário
 app.get("/interacoes/lista/:usuarioId", async (req, res) => {
   const { usuarioId } = req.params;
   try {
@@ -343,6 +342,7 @@ app.get("/interacoes/lista/:usuarioId", async (req, res) => {
   }
 });
 
+//rota para obter a lista de filmes/séries assistidos pelo usuário
 app.get("/interacoes/assistidos/:usuarioId", async (req, res) => {
   const { usuarioId } = req.params;
   try {
@@ -359,7 +359,7 @@ app.get("/interacoes/assistidos/:usuarioId", async (req, res) => {
   }
 });
 
-//Status de UM filme/série específico (usado em DetalhesFilme/DetalhesSeries)
+//rota para verificar se um filme/série está na lista ou foi assistido
 app.get("/interacoes/status/:usuarioId/:filmeId/:tipo", async (req, res) => {
   const { usuarioId, filmeId, tipo } = req.params;
   try {
@@ -379,7 +379,7 @@ app.get("/interacoes/status/:usuarioId/:filmeId/:tipo", async (req, res) => {
   }
 });
 
-// Adiciona / remove da Minha Lista
+// rota para adicionar um filme/série à lista do usuário (ou marcar como assistido)
 app.post("/interacoes/lista/adicionar", async (req, res) => {
   const { usuarioId, filmeId, tipo } = req.body;
   if (!usuarioId || !filmeId) {
@@ -400,6 +400,7 @@ app.post("/interacoes/lista/adicionar", async (req, res) => {
   }
 });
 
+// rota para remover um filme/série da lista do usuário (ou desmarcar como assistido)
 app.post("/interacoes/lista/remover", async (req, res) => {
   const { usuarioId, filmeId, tipo } = req.body;
   try {
@@ -415,7 +416,7 @@ app.post("/interacoes/lista/remover", async (req, res) => {
   }
 });
 
-// Marca / desmarca como assistido
+//rota para marcar um filme/série como assistido
 app.post("/interacoes/assistido/adicionar", async (req, res) => {
   const { usuarioId, filmeId, tipo } = req.body;
   if (!usuarioId || !filmeId) {
@@ -436,6 +437,7 @@ app.post("/interacoes/assistido/adicionar", async (req, res) => {
   }
 });
 
+//rota para desmarcar um filme/série como assistido
 app.post("/interacoes/assistido/remover", async (req, res) => {
   const { usuarioId, filmeId, tipo } = req.body;
   try {
