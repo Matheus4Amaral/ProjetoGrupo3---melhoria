@@ -90,3 +90,35 @@
   font-size: 0.75rem;
   text-align: center;
 }
+.tipoToggle {
+  display: flex;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.categoriesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.categoryPill {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #25283d;
+  color: #b9bfd6;
+  cursor: pointer;
+  transition: 0.2s;
+  user-select: none;
+}
+
+.categoryPill:hover {
+  background: #353957;
+}
+
+.active {
+  background: #f9a826;
+  color: #111;
+  font-weight: 600;
+}

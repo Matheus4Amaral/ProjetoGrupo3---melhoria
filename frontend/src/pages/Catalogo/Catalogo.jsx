@@ -7,6 +7,7 @@ import styles from "./Catalogo.module.css";
 import iconeLupa from "../../assets/icons/lupa.svg";
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+console.log("API_KEY:", API_KEY);
 const IMG_BASE = "https://image.tmdb.org/t/p/w300";
 
 function Catalogo () {
@@ -27,6 +28,7 @@ function Catalogo () {
                 const response = await fetch(
                     `https://api.themoviedb.org/3/genre/${tipoConteudo}/list?api_key=${API_KEY}&language=pt-BR`
                 );
+                
                 const data = await response.json();
                 setGeneros(data.genres || []);
             } catch (err) {

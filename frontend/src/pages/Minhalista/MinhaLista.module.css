@@ -126,3 +126,29 @@
   font-size: 0.75rem;
   text-align: center;
 }
+.tipoToggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.categoryPill {
+  background: #24283b;
+  color: #a8b0d3;
+  border-radius: 999px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.2s;
+  user-select: none;
+}
+
+.categoryPill:hover {
+  background: #303652;
+}
+
+.active {
+  background: #f5a623;
+  color: #000;
+}

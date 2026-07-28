@@ -14,15 +14,14 @@ export default function SeriesCard({
   genre_ids,
   tipo,
 }) {
+  const { mostrarAlerta } = useAlert();
+  const navigate = useNavigate();
 
-  const {mostrarAlerta} = useAlert()
-  const navigate = useNavigate()
-
-  function handleClick(){
-    navigate (`/serie/${id}`)
+  function handleClick() {
+    navigate(`/serie/${id}`);
   }
 
-  function handleAdicionar(e){
+  function handleAdicionar(e) {
     e.stopPropagation();
 
     const resultado = adicionarNaLista({
@@ -32,29 +31,37 @@ export default function SeriesCard({
       release_date: subtitulo,
       genre_ids,
       tipo,
-    })
+    });
 
     mostrarAlerta({
       titulo: resultado.sucesso ? "Sucesso" : "Aviso",
       mensagem: resultado.mensagem,
       textoConfirmar: "OK",
-    })
+    });
 
-    if(resultado.sucesso)
+    if (resultado.sucesso) {
       window.dispatchEvent(new Event("stats-atualizados"));
+    }
   }
 
-
+  function handleRemover(e) {
+    e.stopPropagation();
+    onRemover?.(id);
+  }
 
   return (
     <div className={styles.seriesCard} onClick={handleClick}>
-      <div 
-        className={styles.seriesImagePlaceholder} 
-        style={poster ? {
-            backgroundImage: `url(${poster})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          } : undefined}
+      <div
+        className={styles.seriesImagePlaceholder}
+        style={
+          poster
+            ? {
+                backgroundImage: `url(${poster})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : undefined
+        }
       >
         {mostrarBotaoAdd && (
           <button className={styles.addBtn} onClick={handleAdicionar}>
@@ -69,13 +76,13 @@ export default function SeriesCard({
         )}
       </div>
 
-        <p>{titulo}</p>
+      <p>{titulo}</p>
 
-        {subtitulo && (
-          <span className={styles.serieSubtitulo}>
-            {subtitulo}
-          </span>
-        )}
+      {subtitulo && (
+        <span className={styles.serieSubtitulo}>
+          {subtitulo}
+        </span>
+      )}
     </div>
   );
 }
