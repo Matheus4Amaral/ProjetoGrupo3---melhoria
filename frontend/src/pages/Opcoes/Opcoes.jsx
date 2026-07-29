@@ -5,8 +5,7 @@ import styles from "./Opcoes.module.css";
 
 const API_URL = "http://localhost:3000";
 
-// Regra de senha forte: mínimo 8 caracteres, pelo menos 1 número e
-// pelo menos 1 caractere especial. (mesma regra do formulário de Cadastro)
+// Regra de senha forte: mínimo 8 caracteres, pelo menos 1 número e pelo menos 1 caractere especial. (mesma regra do formulário de Cadastro)
 const REGEX_SENHA_FORTE = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>_\-]).{8,}$/;
 
 export default function Opcoes() {
