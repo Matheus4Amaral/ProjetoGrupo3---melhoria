@@ -534,8 +534,8 @@ app.put("/usuarios/:id", async (req, res) => {
   }
 });
 
-// Rota Coringa: redireciona todas as outras requisições para o React
-app.get("*", (req, res) => {
+// Rota Coringa: redireciona todas as outras requisições para o React (Usando Regex para evitar erros no Render)
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
