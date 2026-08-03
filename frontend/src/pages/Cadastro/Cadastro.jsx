@@ -7,6 +7,8 @@ import NavBar from "../../components/Navbar/Navbar";
 // pelo menos 1 caractere especial.
 const REGEX_SENHA_FORTE = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>_\-]).{8,}$/;
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 const Cadastro = () => {
   const navigate = useNavigate(); // Inicializa o hook de navegação
 
@@ -47,7 +49,7 @@ const Cadastro = () => {
 
     try {
       // Chama a API do Node.js
-      const response = await fetch("http://localhost:3000/cadastro", {
+      const response = await fetch(`${API_URL}/cadastro`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,14 +116,27 @@ const Cadastro = () => {
 
           {formData.password && (
             <ul className={styles.passwordChecklist}>
-              <li className={criteriosSenha.tamanho ? styles.valido : styles.invalido}>
+              <li
+                className={
+                  criteriosSenha.tamanho ? styles.valido : styles.invalido
+                }
+              >
                 {criteriosSenha.tamanho ? "✓" : "✗"} Mínimo de 8 caracteres
               </li>
-              <li className={criteriosSenha.numero ? styles.valido : styles.invalido}>
+              <li
+                className={
+                  criteriosSenha.numero ? styles.valido : styles.invalido
+                }
+              >
                 {criteriosSenha.numero ? "✓" : "✗"} Pelo menos 1 número
               </li>
-              <li className={criteriosSenha.especial ? styles.valido : styles.invalido}>
-                {criteriosSenha.especial ? "✓" : "✗"} Pelo menos 1 caractere especial
+              <li
+                className={
+                  criteriosSenha.especial ? styles.valido : styles.invalido
+                }
+              >
+                {criteriosSenha.especial ? "✓" : "✗"} Pelo menos 1 caractere
+                especial
               </li>
             </ul>
           )}

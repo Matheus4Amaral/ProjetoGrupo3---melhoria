@@ -3,7 +3,8 @@ import Sidebar from "../../components/Sidebar.jsx";
 import { useToast } from "../../components/ToastContext.jsx";
 import styles from "./Opcoes.module.css";
 
-const API_URL = "http://localhost:3000";
+// Se não achar a variável, ele usa "" (vazio)
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 // Regra de senha forte: mínimo 8 caracteres, pelo menos 1 número e pelo menos 1 caractere especial. (mesma regra do formulário de Cadastro)
 const REGEX_SENHA_FORTE = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>_\-]).{8,}$/;
@@ -92,7 +93,9 @@ export default function Opcoes() {
       <Sidebar />
       <main className={styles.mainContent}>
         <h1 className={styles.titulo}>Opções</h1>
-        <h2 className={styles.subtitulo}>Atualize os seus dados de cadastro.</h2>
+        <h2 className={styles.subtitulo}>
+          Atualize os seus dados de cadastro.
+        </h2>
 
         <form onSubmit={handleSalvar} className={styles.card}>
           <h2 className={styles.cardSubtitulo}>Dados da conta</h2>
@@ -148,14 +151,27 @@ export default function Opcoes() {
 
           {querTrocarSenha && (
             <ul className={styles.checklist}>
-              <li className={criteriosSenha.tamanho ? styles.valido : styles.invalido}>
+              <li
+                className={
+                  criteriosSenha.tamanho ? styles.valido : styles.invalido
+                }
+              >
                 {criteriosSenha.tamanho ? "✓" : "✗"} Mínimo de 8 caracteres
               </li>
-              <li className={criteriosSenha.numero ? styles.valido : styles.invalido}>
+              <li
+                className={
+                  criteriosSenha.numero ? styles.valido : styles.invalido
+                }
+              >
                 {criteriosSenha.numero ? "✓" : "✗"} Pelo menos 1 número
               </li>
-              <li className={criteriosSenha.especial ? styles.valido : styles.invalido}>
-                {criteriosSenha.especial ? "✓" : "✗"} Pelo menos 1 caractere especial
+              <li
+                className={
+                  criteriosSenha.especial ? styles.valido : styles.invalido
+                }
+              >
+                {criteriosSenha.especial ? "✓" : "✗"} Pelo menos 1 caractere
+                especial
               </li>
               <li className={senhasCoincidem ? styles.valido : styles.invalido}>
                 {senhasCoincidem ? "✓" : "✗"} As senhas coincidem
@@ -163,7 +179,11 @@ export default function Opcoes() {
             </ul>
           )}
 
-          <button type="submit" className={styles.btnSalvar} disabled={salvando}>
+          <button
+            type="submit"
+            className={styles.btnSalvar}
+            disabled={salvando}
+          >
             {salvando ? "Salvando..." : "Salvar alterações"}
           </button>
         </form>

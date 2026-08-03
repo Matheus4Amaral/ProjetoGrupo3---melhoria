@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000";
+// Se não achar a variável, ele usa "" (vazio)
+const API_URL = import.meta.env.VITE_API_URL || "";
 const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const IMG_BASE = "https://image.tmdb.org/t/p/w300";
 

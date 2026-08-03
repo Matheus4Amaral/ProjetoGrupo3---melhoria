@@ -3,6 +3,8 @@ import "./Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar.jsx";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 function Login() {
   const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,7 +44,7 @@ function Login() {
 
       // Sucesso! Salva o ID do usuário no navegador para usarmos nas outras telas
       localStorage.setItem("usuarioId", data.usuarioId);
-      localStorage.setItem("usuarioNome", data.usuarioNome); 
+      localStorage.setItem("usuarioNome", data.usuarioNome);
 
       // Redireciona para o Início (ou para o Catálogo/Minha Lista, dependendo das suas rotas)
       navigate("/inicio");

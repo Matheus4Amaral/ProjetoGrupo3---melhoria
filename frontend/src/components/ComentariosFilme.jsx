@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import "./ComentariosFilme.css";
 
-const API_URL = "http://localhost:3000";
+// Se não achar a variável, ele usa "" (vazio)
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 export default function ComentariosFilme({ filmeId }) {
   const [comentarios, setComentarios] = useState([]);

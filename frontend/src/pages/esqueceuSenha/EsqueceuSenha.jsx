@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar.jsx";
 import "./EsqueceuSenha.css";
 
-const API_URL = "http://localhost:3000";
+// Se não achar a variável, ele usa "" (vazio)
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 // Regra de senha forte: mínimo 8 caracteres, pelo menos 1 número e
 // pelo menos 1 caractere especial.
@@ -233,8 +234,8 @@ export default function EsqueceuSenha() {
                ========================================= */
               <form onSubmit={handleValidarCodigo} className="form-container">
                 <p className="instruction-text">
-                  Enviamos um código de 6 dígitos para <strong>{contato}</strong>.
-                  Digite-o abaixo.
+                  Enviamos um código de 6 dígitos para{" "}
+                  <strong>{contato}</strong>. Digite-o abaixo.
                 </p>
 
                 <div className="input-group">
@@ -319,7 +320,8 @@ export default function EsqueceuSenha() {
                           color: criteriosSenha.tamanho ? "#2ab8a1" : "#a1a1aa",
                         }}
                       >
-                        {criteriosSenha.tamanho ? "✓" : "✗"} Mínimo de 8 caracteres
+                        {criteriosSenha.tamanho ? "✓" : "✗"} Mínimo de 8
+                        caracteres
                       </li>
                       <li
                         style={{
@@ -332,11 +334,13 @@ export default function EsqueceuSenha() {
                       <li
                         style={{
                           fontSize: "12px",
-                          color: criteriosSenha.especial ? "#2ab8a1" : "#a1a1aa",
+                          color: criteriosSenha.especial
+                            ? "#2ab8a1"
+                            : "#a1a1aa",
                         }}
                       >
-                        {criteriosSenha.especial ? "✓" : "✗"} Pelo menos 1 caractere
-                        especial
+                        {criteriosSenha.especial ? "✓" : "✗"} Pelo menos 1
+                        caractere especial
                       </li>
                     </ul>
                   )}
@@ -359,9 +363,7 @@ export default function EsqueceuSenha() {
                     type="submit"
                     className="btn-solid btn-medium"
                     disabled={
-                      carregando ||
-                      !senhaValida ||
-                      novaSenha !== confirmarSenha
+                      carregando || !senhaValida || novaSenha !== confirmarSenha
                     }
                   >
                     {carregando ? "Salvando..." : "Redefinir senha"}
