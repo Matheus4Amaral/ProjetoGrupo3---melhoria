@@ -5,18 +5,29 @@ const bcrypt = require("bcrypt"); // Importa a biblioteca de criptografia
 const nodemailer = require("nodemailer"); // Importa a biblioteca de envio de e-mails
 require("dotenv").config(); // Carrega as variáveis de ambiente do arquivo .env
 
+const path = require("path");
+
 const app = express();
 app.set("etag", false);
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 // Configuração do banco usando as variáveis de ambiente
-const pool = new Pool({
+/*const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASS,
   port: process.env.DB_PORT,
+});*/
+// Configuração do banco usando a URL do Render
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
 });
 
 // Configuração do envio de e-mails (usado no "Esqueceu a senha")
@@ -292,9 +303,9 @@ app.post("/redefinir-senha", async (req, res) => {
   const registro = codigosRecuperacao[email];
 
   if (!registro || !registro.validado) {
-    return res
-      .status(400)
-      .json({ erro: "Você precisa validar o código antes de redefinir a senha." });
+    return res.status(400).json({
+      erro: "Você precisa validar o código antes de redefinir a senha.",
+    });
   }
 
   if (!senhaEhForte(novaSenha)) {
@@ -523,4 +534,13 @@ app.put("/usuarios/:id", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Backend rodando na porta 3000"));
+// Rota Coringa: redireciona todas as outras requisições para o React
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+
+// Porta Dinâmica do Render
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
